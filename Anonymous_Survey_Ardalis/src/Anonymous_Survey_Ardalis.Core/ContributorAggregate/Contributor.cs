@@ -22,19 +22,42 @@ public class Contributor(string name) : EntityBase, IAggregateRoot
   }
 }
 
-public class PhoneNumber(
-  string countryCode,
-  string number,
-  string? extension) : ValueObject
+public class PhoneNumber : ValueObject
 {
-  public string CountryCode { get; } = countryCode;
-  public string Number { get; } = number;
-  public string? Extension { get; } = extension;
+  public string CountryCode { get; set; } = string.Empty;
+  public string Number { get; set; } = string.Empty;
+  public string? Extension { get; }
+
+  private PhoneNumber() { } // Required by EF Core
+
+  public PhoneNumber(string countryCode, string number, string? extension)
+  {
+    CountryCode = countryCode;
+    Number = number;
+    Extension = extension;
+  }
 
   protected override IEnumerable<object> GetEqualityComponents()
   {
     yield return CountryCode;
     yield return Number;
-    yield return Extension ?? String.Empty;
+    yield return Extension ?? string.Empty;
   }
 }
+
+// public class PhoneNumber(
+//   string countryCode,
+//   string number,
+//   string? extension) : ValueObject
+// {
+//   public string CountryCode { get; } = countryCode;
+//   public string Number { get; } = number;
+//   public string? Extension { get; } = extension;
+//
+//   protected override IEnumerable<object> GetEqualityComponents()
+//   {
+//     yield return CountryCode;
+//     yield return Number;
+//     yield return Extension ?? String.Empty;
+//   }
+// }

@@ -1,6 +1,6 @@
+using Ardalis.Result;
+using Ardalis.SharedKernel;
+
 namespace Anonymous_Survey_Ardalis.UseCases.Comments.Queries.List;
 
-public class ListCommentsQuery
-{
-  
-}
+public record ListCommentsQuery : IQuery<Result<IEnumerable<CommentDto>>>;

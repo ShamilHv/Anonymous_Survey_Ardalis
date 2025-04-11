@@ -5,10 +5,10 @@ using Ardalis.SharedKernel;
 
 namespace Anonymous_Survey_Ardalis.Core.CommentAggregate;
 
-public class Comment(int subjectId, string commentText): EntityBase, IAggregateRoot
+public class Comment(int subjectId, string commentText) : EntityBase, IAggregateRoot
 {
   public int SubjectId { get; set; } = subjectId;
-  public string CommentText { get; set; }=Guard.Against.NullOrEmpty(commentText, nameof(CommentText));
+  public string CommentText { get; set; } = Guard.Against.NullOrEmpty(commentText, nameof(CommentText));
 
   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -29,7 +29,6 @@ public class Comment(int subjectId, string commentText): EntityBase, IAggregateR
   public virtual File? File { get; set; }
 
   public virtual Admin? Admin { get; set; }
-  
 }
 
 public class File : IAggregateRoot
@@ -37,8 +36,4 @@ public class File : IAggregateRoot
   public int FileId { get; set; }
   public string FilePath { get; set; } = String.Empty;
   public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
-  
 }
-
-
-

@@ -2,6 +2,7 @@
 using Anonymous_Survey_Ardalis.Core.Services;
 using Anonymous_Survey_Ardalis.Infrastructure.Data;
 using Anonymous_Survey_Ardalis.Infrastructure.Data.Queries;
+using Anonymous_Survey_Ardalis.UseCases.Comments.Queries.List;
 using Anonymous_Survey_Ardalis.UseCases.Contributors.List;
 using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
@@ -27,8 +28,8 @@ public static class InfrastructureServiceExtensions
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
       .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
       .AddScoped<IListContributorsQueryService, ListContributorsQueryService>()
-      .AddScoped<IDeleteContributorService, DeleteContributorService>();
-
+      .AddScoped<IDeleteContributorService, DeleteContributorService>()
+      .AddScoped<IListCommentQueryService, ListCommentQueryService>();
 
     logger.LogInformation("{Project} services registered", "Infrastructure");
 

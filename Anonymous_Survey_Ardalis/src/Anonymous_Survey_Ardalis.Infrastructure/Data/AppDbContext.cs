@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Anonymous_Survey_Ardalis.Core.CommentAggregate;
 using Anonymous_Survey_Ardalis.Core.ContributorAggregate;
 using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ public class AppDbContext(
   private readonly IDomainEventDispatcher? _dispatcher = dispatcher;
 
   public DbSet<Contributor> Contributors => Set<Contributor>();
+  public DbSet<Comment> Comments => Set<Comment>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
