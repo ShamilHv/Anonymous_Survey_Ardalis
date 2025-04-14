@@ -1,6 +1,9 @@
 ﻿using System.Reflection;
+using Anonymous_Survey_Ardalis.Core.AdminAggregate;
 using Anonymous_Survey_Ardalis.Core.CommentAggregate;
 using Anonymous_Survey_Ardalis.Core.ContributorAggregate;
+using Anonymous_Survey_Ardalis.Core.DepartmentAggregate;
+using Anonymous_Survey_Ardalis.Core.SubjectAggregate;
 using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +17,9 @@ public class AppDbContext(
 
   public DbSet<Contributor> Contributors => Set<Contributor>();
   public DbSet<Comment> Comments => Set<Comment>();
+  public DbSet<Department> Departments => Set<Department>();
+  public DbSet<Subject> Subjects => Set<Subject>();
+  public DbSet<Admin> Admins => Set<Admin>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

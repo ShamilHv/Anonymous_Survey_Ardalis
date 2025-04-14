@@ -34,6 +34,6 @@ public class Comment(int subjectId, string commentText) : EntityBase, IAggregate
 public class File : IAggregateRoot
 {
   public int FileId { get; set; }
-  public string FilePath { get; set; } = String.Empty;
+  public string FilePath { get; set; } = string.Empty;
   public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
 }

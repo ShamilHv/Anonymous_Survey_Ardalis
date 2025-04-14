@@ -9,16 +9,14 @@ public class GetCommentHandler(IReadRepository<Comment> repository) : IQueryHand
 {
   public async Task<Result<CommentDto>> Handle(GetCommentQuery request, CancellationToken cancellationToken)
   {
-    var spec = new CommentByIdSpec(request.commentId);
+    var spec = new CommentByIdSpec(request.CommentId);
     var comment = await repository.FirstOrDefaultAsync(spec, cancellationToken);
     if (comment == null)
     {
       return Result.NotFound();
     }
-    else
-    {
+
     return new CommentDto(comment.Id, comment.SubjectId, comment.CommentText, comment.CreatedAt,
       comment.ParentCommentId, comment.File?.FilePath, comment.IsAdminComment);
-    }
   }
 }

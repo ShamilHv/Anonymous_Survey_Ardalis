@@ -24,10 +24,6 @@ public class Contributor(string name) : EntityBase, IAggregateRoot
 
 public class PhoneNumber : ValueObject
 {
-  public string CountryCode { get; set; } = string.Empty;
-  public string Number { get; set; } = string.Empty;
-  public string? Extension { get; }
-
   private PhoneNumber() { } // Required by EF Core
 
   public PhoneNumber(string countryCode, string number, string? extension)
@@ -36,6 +32,10 @@ public class PhoneNumber : ValueObject
     Number = number;
     Extension = extension;
   }
+
+  public string CountryCode { get; set; } = string.Empty;
+  public string Number { get; set; } = string.Empty;
+  public string? Extension { get; }
 
   protected override IEnumerable<object> GetEqualityComponents()
   {
