@@ -3,15 +3,14 @@ using Ardalis.SharedKernel;
 
 namespace Anonymous_Survey_Ardalis.Core.AdminAggregate;
 
-public class Admin : EntityBase, IAggregateRoot
+public class Admin(string adminName, string email, int subjectId) : EntityBase, IAggregateRoot
 {
-  public string AdminName { get; set; } = Guard.Against.NullOrEmpty(nameof(AdminName));
+  public string AdminName { get; set; } = adminName;
 
-  public string Email { get; set; } = Guard.Against.NullOrEmpty(nameof(Email));
-
+  public string Email { get; set; } = email;
   public string PasswordHash { get; set; } = string.Empty;
 
-  public int SubjectId { get; set; }
+  public int SubjectId { get; set; } = subjectId;
 
   public DateTime CreatedAt { get; set; }
 
