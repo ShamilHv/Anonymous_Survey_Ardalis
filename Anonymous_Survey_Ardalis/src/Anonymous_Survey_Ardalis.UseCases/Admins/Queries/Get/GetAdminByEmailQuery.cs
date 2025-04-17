@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Anonymous_Survey_Ardalis.UseCases.Admins.Queries.Get;
 
-public record GetAdminQuery(int Id) : IRequest<Result<Admin>>;
+public record GetAdminByEmailQuery(string Email) : IRequest<Result<Admin>>;

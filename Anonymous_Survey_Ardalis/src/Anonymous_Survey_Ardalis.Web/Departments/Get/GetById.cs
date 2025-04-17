@@ -1,6 +1,4 @@
 using Anonymous_Survey_Ardalis.UseCases.Departments.Queries.Get;
-using Anonymous_Survey_Ardalis.UseCases.Subjects.Queries;
-using Anonymous_Survey_Ardalis.Web.Subjects;
 using Ardalis.Result;
 using FastEndpoints;
 using MediatR;

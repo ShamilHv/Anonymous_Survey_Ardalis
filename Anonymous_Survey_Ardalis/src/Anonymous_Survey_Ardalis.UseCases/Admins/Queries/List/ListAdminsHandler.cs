@@ -1,5 +1,3 @@
-using Anonymous_Survey_Ardalis.UseCases.Departments;
-using Anonymous_Survey_Ardalis.UseCases.Departments.Queries.List;
 using Ardalis.Result;
 using Ardalis.SharedKernel;
 

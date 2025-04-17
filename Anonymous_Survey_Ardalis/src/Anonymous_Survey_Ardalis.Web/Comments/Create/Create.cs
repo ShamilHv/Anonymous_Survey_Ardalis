@@ -28,6 +28,5 @@ public class Create(IMediator _mediator)
     {
       Response = new CreateCommentResponse(request.SubjectId, request.CommentText) { CommentId = result.Value };
     }
-    // TODO: Handle other cases as necessary
   }
 }

@@ -1,6 +1,4 @@
 using Anonymous_Survey_Ardalis.Core.AdminAggregate;
-using Anonymous_Survey_Ardalis.Core.DepartmentAggregate;
-using Anonymous_Survey_Ardalis.UseCases.Departments.Commands.Create;
 using Ardalis.Result;
 using Ardalis.SharedKernel;
 

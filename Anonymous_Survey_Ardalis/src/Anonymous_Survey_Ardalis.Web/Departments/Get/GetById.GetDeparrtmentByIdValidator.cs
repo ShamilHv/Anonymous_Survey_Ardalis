@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Anonymous_Survey_Ardalis.Web.Departments;
 
-public class GetDeparrtmentByIdValidator: Validator<GetDepartmentByIdRequest>
+public class GetDeparrtmentByIdValidator : Validator<GetDepartmentByIdRequest>
 {
   public GetDeparrtmentByIdValidator()
   {

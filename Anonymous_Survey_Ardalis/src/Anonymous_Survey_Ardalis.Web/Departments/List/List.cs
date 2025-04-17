@@ -1,6 +1,4 @@
-using Anonymous_Survey_Ardalis.UseCases.Contributors.List;
 using Anonymous_Survey_Ardalis.UseCases.Departments.Queries.List;
-using Anonymous_Survey_Ardalis.Web.Contributors;
 using FastEndpoints;
 using MediatR;
 
@@ -21,9 +19,10 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<DepartmentListRe
 
     if (result.IsSuccess)
     {
-      Response = new DepartmentListResponse()
+      Response = new DepartmentListResponse
       {
-        Departments = result.Value.Select(d => new DepartmentRecord(d.DepartmentId, d.DepartmentName, d.CreatedAt)).ToList()
+        Departments = result.Value.Select(d => new DepartmentRecord(d.DepartmentId, d.DepartmentName, d.CreatedAt))
+          .ToList()
       };
     }
   }

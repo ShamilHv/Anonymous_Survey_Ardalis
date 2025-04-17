@@ -1,5 +1,4 @@
 using Anonymous_Survey_Ardalis.Core.SubjectAggregate;
-using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
 
 namespace Anonymous_Survey_Ardalis.Core.DepartmentAggregate;

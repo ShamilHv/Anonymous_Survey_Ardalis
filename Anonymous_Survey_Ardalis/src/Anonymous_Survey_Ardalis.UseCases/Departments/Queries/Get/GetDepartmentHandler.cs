@@ -18,6 +18,6 @@ public class GetDepartmentHandler(IReadRepository<Department> repository)
       return Result.NotFound();
     }
 
-    return new DepartmentDto(department.Id, department.DepartmentName,  DateTime.UtcNow);
+    return new DepartmentDto(department.Id, department.DepartmentName, DateTime.UtcNow);
   }
 }

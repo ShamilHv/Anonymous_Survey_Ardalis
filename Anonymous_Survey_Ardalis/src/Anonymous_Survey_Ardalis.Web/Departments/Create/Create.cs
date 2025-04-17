@@ -1,6 +1,4 @@
 using Anonymous_Survey_Ardalis.UseCases.Departments.Commands.Create;
-using Anonymous_Survey_Ardalis.UseCases.Subjects.Commands.Create;
-using Anonymous_Survey_Ardalis.Web.Subjects;
 using FastEndpoints;
 using MediatR;
 
@@ -27,11 +25,9 @@ public class Create(IMediator _mediator)
 
     if (result.IsSuccess)
     {
-      Response = new CreateDepartmentResponse()
+      Response = new CreateDepartmentResponse
       {
-        DepartmentId = result.Value,
-        CreatedAt = DateTime.UtcNow,
-        DepartmentName = request.DepartmentName
+        DepartmentId = result.Value, CreatedAt = DateTime.UtcNow, DepartmentName = request.DepartmentName
       };
     }
   }

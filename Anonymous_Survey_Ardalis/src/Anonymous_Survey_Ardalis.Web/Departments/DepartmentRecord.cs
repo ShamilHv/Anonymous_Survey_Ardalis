@@ -4,5 +4,4 @@ public record DepartmentRecord(
   int DepartmentId,
   string DepartmentName,
   DateTime CreatedAt
-  );
-
+);

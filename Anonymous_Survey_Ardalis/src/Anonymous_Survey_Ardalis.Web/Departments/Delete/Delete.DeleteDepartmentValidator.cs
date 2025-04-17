@@ -1,10 +1,9 @@
-using Anonymous_Survey_Ardalis.Web.Subjects;
 using FastEndpoints;
 using FluentValidation;
 
 namespace Anonymous_Survey_Ardalis.Web.Departments;
 
-public class DeleteDepartmentValidator: Validator<DeleteDepartmentRequest>
+public class DeleteDepartmentValidator : Validator<DeleteDepartmentRequest>
 {
   public DeleteDepartmentValidator()
   {

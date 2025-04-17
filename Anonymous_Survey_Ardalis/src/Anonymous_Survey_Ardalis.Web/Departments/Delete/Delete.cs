@@ -1,6 +1,4 @@
 using Anonymous_Survey_Ardalis.UseCases.Departments.Commands.Delete;
-using Anonymous_Survey_Ardalis.UseCases.Subjects.Commands.Delete;
-using Anonymous_Survey_Ardalis.Web.Subjects;
 using Ardalis.Result;
 using FastEndpoints;
 using MediatR;

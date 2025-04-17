@@ -6,18 +6,18 @@ using MediatR;
 
 namespace Anonymous_Survey_Ardalis.UseCases.Admins.Queries.Get;
 
-public class GetAdminHandler(IReadRepository<Admin> repository)
-  : IRequestHandler<GetAdminQuery, Result<Admin>>
+public class GetAdminByEmailHandler(IReadRepository<Admin> repository)
+  : IRequestHandler<GetAdminByEmailQuery, Result<Admin>>
 {
-  public async Task<Result<Admin>> Handle(GetAdminQuery request, CancellationToken cancellationToken)
+  public async Task<Result<Admin>> Handle(GetAdminByEmailQuery request, CancellationToken cancellationToken)
   {
-    var spec = new AdminByIdSpec(request.Id);
+    var spec = new AdminByEmailSpec(request.Email);
     var admin = await repository.FirstOrDefaultAsync(spec, cancellationToken);
     if (admin == null)
     {
       return Result.NotFound();
     }
 
-    return admin;
+    return Result<Admin>.Success(admin);
   }
 }
