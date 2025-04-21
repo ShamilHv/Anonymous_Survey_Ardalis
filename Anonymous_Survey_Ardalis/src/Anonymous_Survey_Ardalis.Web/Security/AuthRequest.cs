@@ -1,6 +1,6 @@
 namespace Anonymous_Survey_Ardalis.Web.Security;
 
-public class AuthenticationRequest
+public class AuthRequest
 {
   public string AdminName { get; set; } = null!;
   public string Email { get; set; } = null!;

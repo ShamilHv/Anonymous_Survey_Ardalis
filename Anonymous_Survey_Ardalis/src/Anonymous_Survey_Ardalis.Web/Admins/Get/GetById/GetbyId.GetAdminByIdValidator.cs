@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Anonymous_Survey_Ardalis.Web.Admins.Get.GetById;
 
-public class GetAdminByIdValidator: Validator<GetAdminByIdRequest>
+public class GetAdminByIdValidator : Validator<GetAdminByIdRequest>
 {
   public GetAdminByIdValidator()
   {

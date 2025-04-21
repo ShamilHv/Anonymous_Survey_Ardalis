@@ -10,7 +10,6 @@ public class Create(IMediator _mediator)
   public override void Configure()
   {
     Post(CreateDepartmentRequest.Route);
-    AllowAnonymous();
     Summary(s =>
     {
       s.ExampleRequest = new CreateDepartmentCommand("IT");

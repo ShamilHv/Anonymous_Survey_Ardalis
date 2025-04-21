@@ -2,6 +2,7 @@
 using Anonymous_Survey_Ardalis.Core.Services;
 using Anonymous_Survey_Ardalis.Infrastructure.Data;
 using Anonymous_Survey_Ardalis.Infrastructure.Data.Queries;
+using Anonymous_Survey_Ardalis.UseCases.Admins.Queries.List;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Queries.List;
 using Anonymous_Survey_Ardalis.UseCases.Contributors.List;
 using Anonymous_Survey_Ardalis.UseCases.Departments.Queries.List;
@@ -22,10 +23,10 @@ public static class InfrastructureServiceExtensions
     ConfigurationManager config,
     ILogger logger)
   {
-    var connectionString = config.GetConnectionString("SqliteConnection");
+    var connectionString = config.GetConnectionString("DefaultConnection");
     Guard.Against.Null(connectionString);
     services.AddDbContext<AppDbContext>(options =>
-      options.UseSqlite(connectionString));
+      options.UseSqlServer(connectionString));
 
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
       .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
@@ -33,7 +34,8 @@ public static class InfrastructureServiceExtensions
       .AddScoped<IDeleteContributorService, DeleteContributorService>()
       .AddScoped<IListCommentQueryService, ListCommentQueryService>()
       .AddScoped<IListSubjectQueryService, ListSubjectsQueryService>()
-      .AddScoped<IListDepartmentQueryService, ListDepartmentsQueryService>();
+      .AddScoped<IListDepartmentQueryService, ListDepartmentsQueryService>()
+      .AddScoped<IListAdminsQueryService, ListAdminsQueryService>();
 
     logger.LogInformation("{Project} services registered", "Infrastructure");
 

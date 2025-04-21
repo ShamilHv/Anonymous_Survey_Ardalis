@@ -1,10 +1,10 @@
-using Anonymous_Survey_Ardalis.UseCases.Admins;
+using Anonymous_Survey_Ardalis.Web.Admins;
 
 namespace Anonymous_Survey_Ardalis.Web.Security;
 
-public class AuthenticationResponse
+public class AuthResponse
 {
-  public AdminDto? Admin { get; set; }
+  public AdminRecord? Admin { get; set; }
   public string? Token { get; set; }
   public string? RefreshToken { get; set; }
   public DateTime? RefreshTokenExpiryTime { get; set; }

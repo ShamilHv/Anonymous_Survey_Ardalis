@@ -20,3 +20,4 @@ public class ContributorConfiguration : IEntityTypeConfiguration<Contributor>
         x => ContributorStatus.FromValue(x));
   }
 }
+ 

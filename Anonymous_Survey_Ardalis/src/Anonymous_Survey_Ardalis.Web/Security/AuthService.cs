@@ -3,9 +3,10 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Anonymous_Survey_Ardalis.Core.AdminAggregate;
-using Anonymous_Survey_Ardalis.UseCases.Admins;
 using Anonymous_Survey_Ardalis.UseCases.Admins.Queries.Get;
 using Anonymous_Survey_Ardalis.UseCases.Subjects.Queries;
+using Anonymous_Survey_Ardalis.Web.Admins;
+using Anonymous_Survey_Ardalis.Web.Admins.Auth.Login;
 using Ardalis.Result;
 using Ardalis.SharedKernel;
 using MediatR;
@@ -14,49 +15,83 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Anonymous_Survey_Ardalis.Web.Security;
 
-public class AuthService(IRepository<Admin> repository, IMediator mediator, IPasswordHasher<Admin> passwordHasher, IConfiguration configuration)  : IAuthService
+public class AuthService(
+  IRepository<Admin> repository,
+  IMediator mediator,
+  IPasswordHasher<Admin> passwordHasher,
+  IConfiguration configuration) : IAuthService
 {
-  public async Task<Admin?> RegisterAsync(AuthenticationRequest authenticationRequest)
+  public async Task<Admin?> RegisterAsync(AuthRequest request)
   {
-    var admin = await mediator.Send(new GetAdminByEmailQuery(authenticationRequest.Email));  
-    var subjectId=await mediator.Send(new GetSubjectQuery(authenticationRequest.SubjectId));
-    if (admin != null)
+    var result = await mediator.Send(new GetAdminByEmailQuery(request.Email));
+    var subjectId = await mediator.Send(new GetSubjectQuery(request.SubjectId));
+    if (result != null)
     {
       throw new Exception("Admin wtih this email already exists");
     }
+
     if (subjectId is null)
     {
       throw new Exception($"Subject id: {subjectId} is invalid");
     }
-    var newAdmin = new Admin(authenticationRequest.AdminName, authenticationRequest.Email, authenticationRequest.SubjectId);
-    string passwordHash = new PasswordHasher<Admin>().HashPassword(newAdmin, authenticationRequest.Password);
-    
-    newAdmin.PasswordHash = passwordHash;
-    newAdmin.CreatedAt = DateTime.UtcNow;
 
-    await repository.AddAsync(newAdmin);
+    var newAdmin = new Admin(request.AdminName, request.Email, request.SubjectId);
+    var passwordHash = passwordHasher.HashPassword(newAdmin, request.Password);
+    Console.WriteLine($"Generated hash length: {passwordHash?.Length}, hash: {passwordHash}");
+  
+    newAdmin.PasswordHash = passwordHash!;
+    Console.WriteLine($"Before add - Hash length: {newAdmin.PasswordHash?.Length}, hash: {newAdmin.PasswordHash}");
+  
+    var addedAdmin = await repository.AddAsync(newAdmin);
+  
+    // Add a check here
+    if (string.IsNullOrEmpty(addedAdmin.PasswordHash))
+    {
+      Console.WriteLine("WARNING: Password hash is empty after adding to repository!");
+    }
+    else
+    {
+      Console.WriteLine($"After add - Hash length: {addedAdmin.PasswordHash.Length}");
+    }
+  
     await repository.SaveChangesAsync();
-    return newAdmin;
+  
+    // Re-fetch from database to verify
+    var verifiedAdmin = await repository.GetByIdAsync(addedAdmin.Id);
+    if (verifiedAdmin != null)
+    {
+      Console.WriteLine($"After save - Hash in DB length: {verifiedAdmin.PasswordHash?.Length}, hash: {verifiedAdmin.PasswordHash}");
+    }
+    else
+    {
+      Console.WriteLine("Could not verify admin after saving");
+    }
+  
+    return addedAdmin;
   }
+  
 
-  public async Task<AuthenticationResponse?> LoginRequestAsync(LoginRequest loginRequest)
+  public async Task<AuthResponse?> LoginRequestAsync(LoginRequest loginRequest)
   {
-    var result = await mediator.Send(new GetAdminByEmailQuery(loginRequest.Email));   
+    var result = await mediator.Send(new GetAdminByEmailQuery(loginRequest.Email));
     if (result.Status != ResultStatus.Ok || result.Value == null)
     {
-      throw new Exception("Invalid login request");
+      throw new Exception("Admin with this email does not exist");
     }
+
     var admin = result.Value;
-    var passwordVerificationResult = passwordHasher.VerifyHashedPassword(admin, admin.PasswordHash, loginRequest.Password);
+    var passwordVerificationResult =
+      passwordHasher.VerifyHashedPassword(admin, admin.PasswordHash, loginRequest.Password);
 
     if (passwordVerificationResult == PasswordVerificationResult.Failed)
     {
-     throw new Exception("Invalid password");
+      throw new Exception("Invalid password");
     }
-    var response = new AuthenticationResponse
+
+    var response = new AuthResponse
     {
-      Admin=new AdminDto(admin.Id, admin.AdminName, admin.Email, admin.SubjectId,admin.CreatedAt),
-      Token = CreateToken(admin), 
+      Admin = new AdminRecord(admin.Id, admin.AdminName, admin.Email, admin.SubjectId, admin.CreatedAt),
+      Token = CreateToken(admin),
       RefreshToken = GenerateRefreshToken(),
       RefreshTokenExpiryTime = null
     };
@@ -65,60 +100,59 @@ public class AuthService(IRepository<Admin> repository, IMediator mediator, IPas
 
   public async Task<TokenResponse?> RefreshTokensAsync(TokenRequest request)
   {
-    Admin? admin = await ValidateRefreshTokenAsync(request.AdminId, request.RefreshToken);
+    var admin = await ValidateRefreshTokenAsync(request.AdminId, request.RefreshToken);
     if (admin is null)
     {
       return null;
     }
 
     return await CreateTokenResponse(admin);
-    
   }
-  
+
   private async Task<TokenResponse> CreateTokenResponse(Admin admin)
   {
-    return new TokenResponse()
+    return new TokenResponse
     {
       Token = CreateToken(admin),
       RefreshToken = await GenerateAndSaveRefreshTokenAsync(admin),
       RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(5)
     };
   }
-  
+
   private async Task<Admin> ValidateRefreshTokenAsync(int adminId, string refreshToken)
   {
-    var admin = await mediator.Send(new GetAdminQuery(adminId));  
-    if (admin is null || admin.Value.RefreshToken != refreshToken || admin.Value.RefreshTokenExpiryTime <= DateTime.UtcNow)
+    var admin = await mediator.Send(new GetAdminQuery(adminId));
+    if (admin is null || admin.Value.RefreshToken != refreshToken ||
+        admin.Value.RefreshTokenExpiryTime <= DateTime.UtcNow)
     {
       throw new Exception("Could not validate refresh token");
     }
+
     return admin;
   }
-  
+
   private string GenerateRefreshToken()
   {
-    byte[] randomNumber = new byte[32];
+    var randomNumber = new byte[32];
     using var rng = RandomNumberGenerator.Create();
     rng.GetBytes(randomNumber);
     return Convert.ToBase64String(randomNumber);
   }
-  
-  
+
   private async Task<string> GenerateAndSaveRefreshTokenAsync(Admin admin)
   {
-    string refreshToken = GenerateRefreshToken();
+    var refreshToken = GenerateRefreshToken();
     admin.RefreshToken = refreshToken;
     admin.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2);
     await repository.SaveChangesAsync();
     return refreshToken;
   }
-  
+
   private string CreateToken(Admin admin)
   {
     var claims = new List<Claim>
     {
-      new(ClaimTypes.Name, admin.AdminName),
-      new(ClaimTypes.NameIdentifier, admin.Id.ToString())
+      new(ClaimTypes.Name, admin.AdminName), new(ClaimTypes.NameIdentifier, admin.Id.ToString())
     };
     var key = new SymmetricSecurityKey(
       Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));
@@ -132,5 +166,4 @@ public class AuthService(IRepository<Admin> repository, IMediator mediator, IPas
     );
     return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
   }
-  
 }

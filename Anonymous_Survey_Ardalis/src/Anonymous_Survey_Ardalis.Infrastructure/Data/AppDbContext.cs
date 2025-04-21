@@ -6,6 +6,7 @@ using Anonymous_Survey_Ardalis.Core.DepartmentAggregate;
 using Anonymous_Survey_Ardalis.Core.SubjectAggregate;
 using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
+using File = Anonymous_Survey_Ardalis.Core.CommentAggregate.File;
 
 namespace Anonymous_Survey_Ardalis.Infrastructure.Data;
 
@@ -17,6 +18,7 @@ public class AppDbContext(
 
   public DbSet<Contributor> Contributors => Set<Contributor>();
   public DbSet<Comment> Comments => Set<Comment>();
+  public DbSet<File> Files => Set<File>();
   public DbSet<Department> Departments => Set<Department>();
   public DbSet<Subject> Subjects => Set<Subject>();
   public DbSet<Admin> Admins => Set<Admin>();

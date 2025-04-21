@@ -1,6 +1,7 @@
 namespace Anonymous_Survey_Ardalis.Web.Admins.Get.GetByEmail;
 
-public class GetAdminByEmailRequest{
+public class GetAdminByEmailRequest
+{
   public const string Route = "/Admins/{AdminEmail:string}";
 
   public string AdminEmail { get; set; } = string.Empty;
@@ -9,5 +10,4 @@ public class GetAdminByEmailRequest{
   {
     return Route.Replace("{AdminEmail:string}", adminEmail);
   }
-  
 }
