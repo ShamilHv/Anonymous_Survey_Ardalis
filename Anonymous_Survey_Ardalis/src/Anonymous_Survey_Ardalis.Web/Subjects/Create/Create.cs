@@ -10,7 +10,7 @@ public class Create(IMediator _mediator)
   public override void Configure()
   {
     Post(CreateSubjectRequest.Route);
-    AllowAnonymous();
+    AllowFormData();
     Summary(s =>
     {
       s.ExampleRequest = new CreateSubjectCommand("Design", 2);

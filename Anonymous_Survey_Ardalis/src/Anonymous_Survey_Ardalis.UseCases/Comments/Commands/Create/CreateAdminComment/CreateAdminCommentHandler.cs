@@ -21,8 +21,8 @@ public class CreateAdminCommentHandler(IRepository<Comment> _repository, IHttpCo
 
     var adminComment = new Comment(comment.SubjectId, request.CommentText)
     {
-      IsAdminComment = true, 
-      ParentCommentId = comment.Id, 
+      IsAdminComment = true,
+      ParentCommentId = comment.Id,
       CreatedAt = DateTime.UtcNow,
       SubjectId = request.SubjectId,
       AdminId = GetCurrentAdminId()
@@ -33,7 +33,7 @@ public class CreateAdminCommentHandler(IRepository<Comment> _repository, IHttpCo
 
     return await Task.FromResult(new Result<Comment>(adminComment));
   }
-  
+
   private int GetCurrentAdminId()
   {
     var httpContext = httpContextAccessor.HttpContext;

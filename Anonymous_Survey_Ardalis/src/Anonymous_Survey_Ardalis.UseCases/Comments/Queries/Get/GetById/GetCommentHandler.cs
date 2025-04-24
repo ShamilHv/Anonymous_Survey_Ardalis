@@ -17,6 +17,6 @@ public class GetCommentHandler(IReadRepository<Comment> repository) : IQueryHand
     }
 
     return new CommentDto(comment.Id, comment.SubjectId, comment.CommentText, comment.CreatedAt,
-      comment.ParentCommentId, comment.File?.FilePath, comment.IsAdminComment);
+      comment.ParentCommentId, comment.File?.FileId, comment.IsAdminComment);
   }
 }

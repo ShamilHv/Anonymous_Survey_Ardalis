@@ -12,18 +12,18 @@ public class CreateCommentHandler(IRepository<Comment> _repository, IRepository<
   public async Task<Result<int>> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
   {
     var newComment = new Comment(request.SubjectId, request.CommentText);
-  
+
     if (request.File != null)
     {
       // Upload the file first
       var fileEntity = await UploadFileAsync(request.File, cancellationToken);
       await _fileRepository.AddAsync(fileEntity, cancellationToken);
       await _fileRepository.SaveChangesAsync(cancellationToken);
-    
+
       // Set the FileId on the comment
       newComment.FileId = fileEntity.FileId;
     }
-  
+
     // Save the comment
     await _repository.AddAsync(newComment, cancellationToken);
     await _repository.SaveChangesAsync(cancellationToken);
@@ -49,11 +49,7 @@ public class CreateCommentHandler(IRepository<Comment> _repository, IRepository<
       await file.CopyToAsync(stream, cancellationToken);
     }
 
-    return new File 
-    { 
-      FilePath = $"/uploads/{fileName}", 
-      UploadedAt = DateTime.UtcNow 
-    };
+    return new File { FilePath = $"/uploads/{fileName}", UploadedAt = DateTime.UtcNow };
   }
   // public async Task<Result<int>> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
   // {

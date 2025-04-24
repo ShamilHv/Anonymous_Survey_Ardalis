@@ -47,52 +47,6 @@ public class AuthService(
 
     return addedAdmin;
   }
-  // public async Task<Admin?> RegisterAsync(AuthRequest request)
-  // {
-  //   var result = await mediator.Send(new GetAdminByEmailQuery(request.Email));
-  //   var subjectId = await mediator.Send(new GetSubjectQuery(request.SubjectId));
-  //   if (!result.IsNotFound())
-  //   {
-  //     throw new Exception("Admin wtih this email already exists");
-  //   }
-  //
-  //   if (subjectId is null)
-  //   {
-  //     throw new Exception($"Subject id: {subjectId} is invalid");
-  //   }
-  //
-  //   var newAdmin = new Admin(request.AdminName, request.Email, request.SubjectId);
-  //   var passwordHash = passwordHasher.HashPassword(newAdmin, request.Password);
-  //   Console.WriteLine($"Generated hash length: {passwordHash?.Length}, hash: {passwordHash}");
-  //
-  //   newAdmin.PasswordHash = passwordHash!;
-  //   Console.WriteLine($"Before add - Hash length: {newAdmin.PasswordHash?.Length}, hash: {newAdmin.PasswordHash}");
-  //
-  //   var addedAdmin = await repository.AddAsync(newAdmin);
-  //
-  //   if (string.IsNullOrEmpty(addedAdmin.PasswordHash))
-  //   {
-  //     Console.WriteLine("WARNING: Password hash is empty after adding to repository!");
-  //   }
-  //   else
-  //   {
-  //     Console.WriteLine($"After add - Hash length: {addedAdmin.PasswordHash.Length}");
-  //   }
-  //
-  //   //await repository.SaveChangesAsync();
-  //
-  //   var verifiedAdmin = await repository.GetByIdAsync(addedAdmin.Id);
-  //   if (verifiedAdmin != null)
-  //   {
-  //     Console.WriteLine($"After save - Hash in DB length: {verifiedAdmin.PasswordHash?.Length}, hash: {verifiedAdmin.PasswordHash}");
-  //   }
-  //   else
-  //   {
-  //     Console.WriteLine("Could not verify admin after saving");
-  //   }
-  //
-  //   return addedAdmin;
-  // }
 
 
   public async Task<AdminRecord> GetCurrentAdmin()
@@ -107,8 +61,6 @@ public class AuthService(
     return new AdminRecord(result.Value.Id, result.Value.AdminName, result.Value.Email, result.Value.SubjectId,
       result.Value.CreatedAt);
   }
-
-
   public async Task<AuthResponse?> LoginRequestAsync(LoginRequest loginRequest)
   {
     var result = await mediator.Send(new GetAdminByEmailQuery(loginRequest.Email));
@@ -128,16 +80,48 @@ public class AuthService(
 
     var refreshToken = GenerateRefreshToken();
     result.Value.RefreshToken = refreshToken;
+    result.Value.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2);
     await repository.SaveChangesAsync();
+    
     var response = new AuthResponse
     {
       Admin = new AdminRecord(admin.Id, admin.AdminName, admin.Email, admin.SubjectId, admin.CreatedAt),
       Token = CreateToken(admin),
       RefreshToken = refreshToken,
-      RefreshTokenExpiryTime = null
+      RefreshTokenExpiryTime = result.Value.RefreshTokenExpiryTime // Use the same expiry time we set above
     };
     return response;
   }
+  //
+  // public async Task<AuthResponse?> LoginRequestAsync(LoginRequest loginRequest)
+  // {
+  //   var result = await mediator.Send(new GetAdminByEmailQuery(loginRequest.Email));
+  //   if (result.Status != ResultStatus.Ok || result.Value == null)
+  //   {
+  //     throw new Exception("Admin with this email does not exist");
+  //   }
+  //
+  //   var admin = result.Value;
+  //   var passwordVerificationResult =
+  //     passwordHasher.VerifyHashedPassword(admin, admin.PasswordHash, loginRequest.Password);
+  //
+  //   if (passwordVerificationResult == PasswordVerificationResult.Failed)
+  //   {
+  //     throw new Exception("Invalid password");
+  //   }
+  //
+  //   var refreshToken = GenerateRefreshToken();
+  //   result.Value.RefreshToken = refreshToken;
+  //   await repository.SaveChangesAsync();
+  //   var response = new AuthResponse
+  //   {
+  //     Admin = new AdminRecord(admin.Id, admin.AdminName, admin.Email, admin.SubjectId, admin.CreatedAt),
+  //     Token = CreateToken(admin),
+  //     RefreshToken = refreshToken,
+  //     RefreshTokenExpiryTime = null
+  //   };
+  //   return response;
+  // }
 
   public async Task<TokenResponse?> RefreshTokensAsync(TokenRequest request)
   {
@@ -152,24 +136,32 @@ public class AuthService(
 
   private async Task<TokenResponse> CreateTokenResponse(Admin admin)
   {
+    var refreshToken = GenerateRefreshToken();
+    var refreshTokenExpiry = DateTime.UtcNow.AddDays(2);
+    
+    admin.RefreshToken = refreshToken;
+    admin.RefreshTokenExpiryTime = refreshTokenExpiry;
+    await repository.SaveChangesAsync();
+    
     return new TokenResponse
     {
       Token = CreateToken(admin),
-      RefreshToken = await GenerateAndSaveRefreshTokenAsync(admin),
-      RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(5)
+      RefreshToken = refreshToken,
+      RefreshTokenExpiryTime = refreshTokenExpiry
     };
   }
 
-  private async Task<Admin> ValidateRefreshTokenAsync(int adminId, string refreshToken)
+  private async Task<Admin?> ValidateRefreshTokenAsync(int adminId, string refreshToken)
   {
-    var admin = await mediator.Send(new GetAdminQuery(adminId));
-    if (admin is null || admin.Value.RefreshToken != refreshToken ||
-        admin.Value.RefreshTokenExpiryTime <= DateTime.UtcNow)
+    var result = await mediator.Send(new GetAdminQuery(adminId));
+    if (result.Status != ResultStatus.Ok || result.Value == null || 
+        result.Value.RefreshToken != refreshToken ||
+        result.Value.RefreshTokenExpiryTime <= DateTime.UtcNow)
     {
       throw new Exception("Could not validate refresh token");
     }
 
-    return admin;
+    return result.Value;
   }
 
   private string GenerateRefreshToken()
@@ -180,34 +172,39 @@ public class AuthService(
     return Convert.ToBase64String(randomNumber);
   }
 
-  private async Task<string> GenerateAndSaveRefreshTokenAsync(Admin admin)
-  {
-    var refreshToken = GenerateRefreshToken();
-    admin.RefreshToken = refreshToken;
-    admin.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2);
-    await repository.SaveChangesAsync();
-    return refreshToken;
-  }
+  // private async Task<string> GenerateAndSaveRefreshTokenAsync(Admin admin)
+  // {
+  //   var refreshToken = GenerateRefreshToken();
+  //   admin.RefreshToken = refreshToken;
+  //   admin.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2);
+  //   await repository.SaveChangesAsync();
+  //   return refreshToken;
+  // }
 
   private string CreateToken(Admin admin)
   {
     var claims = new List<Claim>
     {
-      new(ClaimTypes.Name, admin.AdminName), new(ClaimTypes.NameIdentifier, admin.Id.ToString())
+      new(ClaimTypes.Name, admin.AdminName), 
+      new(ClaimTypes.NameIdentifier, admin.Id.ToString())
     };
+    
     var key = new SymmetricSecurityKey(
       Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));
     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+    
+    var tokenExpiry = DateTime.UtcNow.AddHours(8);
+    
     var tokenDescriptor = new JwtSecurityToken(
       configuration.GetValue<string>("AppSettings:Issuer"),
       configuration.GetValue<string>("AppSettings:Audience"),
       claims,
-      expires: DateTime.UtcNow.AddHours(8),
+      expires: tokenExpiry,
       signingCredentials: creds
     );
+    
     return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
   }
-
   private string GetCurrentAdminName()
   {
     var httpContext = httpContextAccessor.HttpContext;

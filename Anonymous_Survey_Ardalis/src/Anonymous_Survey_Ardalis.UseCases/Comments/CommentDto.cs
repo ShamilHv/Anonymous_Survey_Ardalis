@@ -6,5 +6,5 @@ public record CommentDto(
   string CommentText,
   DateTime CreatedAt,
   int? ParentCommentId,
-  string? FilePath,
+  int? FileId,
   bool IsAdminComment);

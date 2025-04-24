@@ -10,13 +10,10 @@ public class Login(IAuthService authService)
   {
     Post(LoginRequest.Route);
     AllowAnonymous();
+    AllowFormData();
     Summary(s =>
     {
-      s.ExampleRequest = new LoginRequest()
-      {
-        Email = "admim@mail.com",
-        Password = "Admin@123"
-      };
+      s.ExampleRequest = new LoginRequest { Email = "admim@mail.com", Password = "Admin@123" };
     });
   }
 

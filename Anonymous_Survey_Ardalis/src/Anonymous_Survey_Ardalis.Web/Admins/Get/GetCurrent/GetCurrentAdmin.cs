@@ -8,7 +8,7 @@ public class GetCurrentAdminGetById(IAuthService authService) : Endpoint<EmptyRe
 {
   public override void Configure()
   {
-    Get("/Admins/Current"); // Use the route directly instead of from request class
+    Get("/Admins/Current");
   }
 
   public override async Task HandleAsync(EmptyRequest request,

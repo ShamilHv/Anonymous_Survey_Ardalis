@@ -1,7 +1,5 @@
-using Anonymous_Survey_Ardalis.Core.CommentAggregate;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Commands.Create.CreateAdminComment;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Queries.Get;
-using Ardalis.SharedKernel;
 using FastEndpoints;
 using MediatR;
 
@@ -13,9 +11,10 @@ public class Create(IMediator _mediator)
   public override void Configure()
   {
     Post(CreateAdminCommentRequest.Route);
+    AllowFormData();
     Summary(s =>
     {
-      s.ExampleRequest = new CreateAdminCommentRequest() { CommentText = "Comment text", ParentCommentId = 2 };
+      s.ExampleRequest = new CreateAdminCommentRequest { CommentText = "Comment text", ParentCommentId = 2 };
     });
   }
 
@@ -31,17 +30,16 @@ public class Create(IMediator _mediator)
     {
       throw new Exception("Comment not found");
     }
+
     var result = await _mediator.Send(new CreateAdminCommentCommand(request.ParentCommentId,
       request.CommentText, comment.Value.SubjectId), cancellationToken);
-    
-    
+
+
     if (result.IsSuccess)
     {
       Response = new CreateAdminCommentResponse(request.ParentCommentId, request.CommentText)
       {
-        CommentId = result.Value.Id,
-        CommentText = result.Value.CommentText,
-        SubjectId = comment.Value.SubjectId
+        CommentId = result.Value.Id, CommentText = result.Value.CommentText, SubjectId = comment.Value.SubjectId
       };
     }
   }
@@ -55,7 +53,6 @@ public class Create(IMediator _mediator)
 // public string? FilePath { get; set; }
 // public bool IsAdminComment { get; set; } = true;
 // }
-
 
 // await _repository.AddAsync(adminComment, cancellationToken);
 // await _repository.SaveChangesAsync(cancellationToken);

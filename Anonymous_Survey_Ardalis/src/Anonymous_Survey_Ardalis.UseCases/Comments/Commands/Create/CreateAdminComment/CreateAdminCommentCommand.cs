@@ -4,4 +4,5 @@ using Ardalis.SharedKernel;
 
 namespace Anonymous_Survey_Ardalis.UseCases.Comments.Commands.Create.CreateAdminComment;
 
-public record CreateAdminCommentCommand(int ParentCommentId, string CommentText, int SubjectId) : ICommand<Result<Comment>>;
+public record CreateAdminCommentCommand(int ParentCommentId, string CommentText, int SubjectId)
+  : ICommand<Result<Comment>>;

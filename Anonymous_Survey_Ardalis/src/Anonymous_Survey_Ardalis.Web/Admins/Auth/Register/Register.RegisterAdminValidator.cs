@@ -1,22 +1,25 @@
+using Anonymous_Survey_Ardalis.Web.Security;
 using FastEndpoints;
 using FluentValidation;
 
 namespace Anonymous_Survey_Ardalis.Web.Admins.Auth.Register;
 
-public class RegisterAdminValidator : Validator<RegisterAdminRequest>
+public class RegisterAdminValidator : Validator<AuthRequest>
 {
   public RegisterAdminValidator()
   {
-    RuleFor(x => x.AuthRequest.Email)
+    RuleFor(x => x.Email)
+      .NotEmpty()
       .EmailAddress()
       .WithMessage("Invalid email address");
-    RuleFor(x => x.AuthRequest.AdminName)
+    RuleFor(x => x.AdminName)
       .NotEmpty()
       .WithMessage("Name is required");
-    RuleFor(x => x.AuthRequest.SubjectId)
+    RuleFor(x => x.SubjectId)
+      .NotEmpty()
       .GreaterThan(0)
       .WithMessage("Invalid Subject Id");
-    RuleFor(x => x.AuthRequest.Password)
+    RuleFor(x => x.Password)
       .NotEmpty().WithMessage("Password is required")
       .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$")
       .WithMessage(

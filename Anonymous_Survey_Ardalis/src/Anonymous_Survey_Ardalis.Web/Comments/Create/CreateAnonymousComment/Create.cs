@@ -11,13 +11,13 @@ public class Create(IMediator _mediator)
   {
     Post(CreateCommentRequest.Route);
     AllowAnonymous();
-    AllowFormData(); // Important for file uploads
+    AllowFormData();
     Summary(s =>
     {
       s.ExampleRequest = new CreateCommentRequest { SubjectId = 1 };
-      // Remove the problematic RequestParam line
     });
   }
+
   public override async Task HandleAsync(
     CreateCommentRequest request,
     CancellationToken cancellationToken)
@@ -27,10 +27,9 @@ public class Create(IMediator _mediator)
 
     if (result.IsSuccess)
     {
-      Response = new CreateCommentResponse(request.SubjectId, request.CommentText) 
-      { 
-        CommentId = result.Value,
-        HasFile = request.File != null
+      Response = new CreateCommentResponse(request.SubjectId, request.CommentText)
+      {
+        CommentId = result.Value, HasFile = request.File != null
       };
     }
   }

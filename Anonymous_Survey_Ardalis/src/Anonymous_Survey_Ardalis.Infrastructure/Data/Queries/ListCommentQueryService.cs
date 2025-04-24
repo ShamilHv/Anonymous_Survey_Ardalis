@@ -9,8 +9,8 @@ public class ListCommentQueryService : IListCommentQueryService
   {
     List<CommentDto> fakeComments =
     [
-      new(1, 1, "klsdm", DateTime.UtcNow, null, "/", false),
-      new(2, 2, "klsdm", DateTime.UtcNow, null, "/", false)
+      new(1, 1, "klsdm", DateTime.UtcNow, null, 1, false),
+      new(2, 2, "klsdm", DateTime.UtcNow, null, 2, false)
     ];
 
     return Task.FromResult(fakeComments.AsEnumerable());

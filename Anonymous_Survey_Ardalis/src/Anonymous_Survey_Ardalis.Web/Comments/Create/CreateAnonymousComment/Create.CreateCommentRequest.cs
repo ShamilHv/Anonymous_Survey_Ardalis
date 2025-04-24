@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-
 public class CreateCommentRequest
 {
   public const string Route = "/Comments";

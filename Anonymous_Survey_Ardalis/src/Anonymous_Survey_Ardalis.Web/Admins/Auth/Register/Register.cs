@@ -4,24 +4,27 @@ using FastEndpoints;
 namespace Anonymous_Survey_Ardalis.Web.Admins.Auth.Register;
 
 public class Register(IAuthService authService)
-  : Endpoint<RegisterAdminRequest, RegisterAdminResponse>
+  : Endpoint<AuthRequest, RegisterAdminResponse>
 {
   public override void Configure()
   {
-    Post(RegisterAdminRequest.Route);
+    Post("/Auth/Register");
     AllowAnonymous();
+    AllowFormData();
     Summary(s =>
     {
-      s.ExampleRequest = new RegisterAdminRequest();
+      s.ExampleRequest = new AuthRequest
+      {
+        AdminName = "Admin", Email = "admin@example.com", Password = "password", SubjectId = 1
+      };
     });
   }
 
   public override async Task HandleAsync(
-    RegisterAdminRequest request,
+    AuthRequest request,
     CancellationToken cancellationToken)
   {
-    // Option 1: Use AuthService only (recommended)
-    var admin = await authService.RegisterAsync(request.AuthRequest);
+    var admin = await authService.RegisterAsync(request);
 
     if (admin != null)
     {
@@ -35,32 +38,5 @@ public class Register(IAuthService authService)
         }
       };
     }
-
-    // OR Option 2: Use MediatR only (not both)
-    // var result = await _mediator.Send(new CreateAdminCommand(...), cancellationToken);
-    // ...rest of your code...
   }
-
-  // public override async Task HandleAsync(
-  //   RegisterAdminRequest request,
-  //   CancellationToken cancellationToken)
-  // {
-  //   var adminRegistered = authService.RegisterAsync(request.AuthRequest);
-  //
-  //   var result = await _mediator.Send(new CreateAdminCommand(request.AuthRequest.AdminName,
-  //     request.AuthRequest.Email, request.AuthRequest.SubjectId, request.AuthRequest.Password), cancellationToken);
-  //
-  //   if (result.IsSuccess)
-  //   {
-  //     Response = new RegisterAdminResponse
-  //     {
-  //       AuthResponse = new AuthResponse
-  //       {
-  //         Admin = new AdminRecord(result.Value.Id, result.Value.AdminName, result.Value.Email,
-  //           result.Value.SubjectId, result.Value.CreatedAt),
-  //         RefreshToken = result.Value.RefreshToken
-  //       }
-  //     };
-  //   }
-  //}
 }

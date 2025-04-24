@@ -8,6 +8,7 @@ public class LoginValidator : Validator<LoginRequest>
   public LoginValidator()
   {
     RuleFor(a => a.Email)
+      .NotEmpty()
       .EmailAddress()
       .WithMessage("Invalid Email Address");
     RuleFor(a => a.Password)
