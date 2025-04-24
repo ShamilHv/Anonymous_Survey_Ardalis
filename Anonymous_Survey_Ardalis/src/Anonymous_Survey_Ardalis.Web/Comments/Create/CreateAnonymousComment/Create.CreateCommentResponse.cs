@@ -1,4 +1,4 @@
-namespace Anonymous_Survey_Ardalis.Web.Comments;
+namespace Anonymous_Survey_Ardalis.Web.Comments.Create.CreateAnonymousComment;
 
 public class CreateCommentResponse(int subjectId, string commentText)
 {

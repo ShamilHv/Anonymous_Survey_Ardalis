@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace Anonymous_Survey_Ardalis.Web.Security;
 
 public class AuthService(
+  IHttpContextAccessor httpContextAccessor,
   IRepository<Admin> repository,
   IMediator mediator,
   IPasswordHasher<Admin> passwordHasher,
@@ -23,53 +24,90 @@ public class AuthService(
 {
   public async Task<Admin?> RegisterAsync(AuthRequest request)
   {
+    // Check if email exists and subject is valid
     var result = await mediator.Send(new GetAdminByEmailQuery(request.Email));
-    var subjectId = await mediator.Send(new GetSubjectQuery(request.SubjectId));
-    if (result != null)
+    var subjectResult = await mediator.Send(new GetSubjectQuery(request.SubjectId));
+
+    if (!result.IsNotFound())
     {
-      throw new Exception("Admin wtih this email already exists");
+      throw new Exception("Admin with this email already exists");
     }
 
-    if (subjectId is null)
+    if (subjectResult is null || !subjectResult.IsSuccess)
     {
-      throw new Exception($"Subject id: {subjectId} is invalid");
+      throw new Exception($"Subject id: {request.SubjectId} is invalid");
     }
 
     var newAdmin = new Admin(request.AdminName, request.Email, request.SubjectId);
     var passwordHash = passwordHasher.HashPassword(newAdmin, request.Password);
-    Console.WriteLine($"Generated hash length: {passwordHash?.Length}, hash: {passwordHash}");
-  
     newAdmin.PasswordHash = passwordHash!;
-    Console.WriteLine($"Before add - Hash length: {newAdmin.PasswordHash?.Length}, hash: {newAdmin.PasswordHash}");
-  
+    newAdmin.CreatedAt = DateTime.UtcNow;
     var addedAdmin = await repository.AddAsync(newAdmin);
-  
-    // Add a check here
-    if (string.IsNullOrEmpty(addedAdmin.PasswordHash))
-    {
-      Console.WriteLine("WARNING: Password hash is empty after adding to repository!");
-    }
-    else
-    {
-      Console.WriteLine($"After add - Hash length: {addedAdmin.PasswordHash.Length}");
-    }
-  
-    await repository.SaveChangesAsync();
-  
-    // Re-fetch from database to verify
-    var verifiedAdmin = await repository.GetByIdAsync(addedAdmin.Id);
-    if (verifiedAdmin != null)
-    {
-      Console.WriteLine($"After save - Hash in DB length: {verifiedAdmin.PasswordHash?.Length}, hash: {verifiedAdmin.PasswordHash}");
-    }
-    else
-    {
-      Console.WriteLine("Could not verify admin after saving");
-    }
-  
+    await repository.SaveChangesAsync(); // Make sure this is not commented out!
+
     return addedAdmin;
   }
-  
+  // public async Task<Admin?> RegisterAsync(AuthRequest request)
+  // {
+  //   var result = await mediator.Send(new GetAdminByEmailQuery(request.Email));
+  //   var subjectId = await mediator.Send(new GetSubjectQuery(request.SubjectId));
+  //   if (!result.IsNotFound())
+  //   {
+  //     throw new Exception("Admin wtih this email already exists");
+  //   }
+  //
+  //   if (subjectId is null)
+  //   {
+  //     throw new Exception($"Subject id: {subjectId} is invalid");
+  //   }
+  //
+  //   var newAdmin = new Admin(request.AdminName, request.Email, request.SubjectId);
+  //   var passwordHash = passwordHasher.HashPassword(newAdmin, request.Password);
+  //   Console.WriteLine($"Generated hash length: {passwordHash?.Length}, hash: {passwordHash}");
+  //
+  //   newAdmin.PasswordHash = passwordHash!;
+  //   Console.WriteLine($"Before add - Hash length: {newAdmin.PasswordHash?.Length}, hash: {newAdmin.PasswordHash}");
+  //
+  //   var addedAdmin = await repository.AddAsync(newAdmin);
+  //
+  //   if (string.IsNullOrEmpty(addedAdmin.PasswordHash))
+  //   {
+  //     Console.WriteLine("WARNING: Password hash is empty after adding to repository!");
+  //   }
+  //   else
+  //   {
+  //     Console.WriteLine($"After add - Hash length: {addedAdmin.PasswordHash.Length}");
+  //   }
+  //
+  //   //await repository.SaveChangesAsync();
+  //
+  //   var verifiedAdmin = await repository.GetByIdAsync(addedAdmin.Id);
+  //   if (verifiedAdmin != null)
+  //   {
+  //     Console.WriteLine($"After save - Hash in DB length: {verifiedAdmin.PasswordHash?.Length}, hash: {verifiedAdmin.PasswordHash}");
+  //   }
+  //   else
+  //   {
+  //     Console.WriteLine("Could not verify admin after saving");
+  //   }
+  //
+  //   return addedAdmin;
+  // }
+
+
+  public async Task<AdminRecord> GetCurrentAdmin()
+  {
+    var adminId = GetCurrentAdminId();
+    var result = await mediator.Send(new GetAdminQuery(adminId));
+    if (result.Status != ResultStatus.Ok || result.Value == null)
+    {
+      throw new Exception("Admin could not be found");
+    }
+
+    return new AdminRecord(result.Value.Id, result.Value.AdminName, result.Value.Email, result.Value.SubjectId,
+      result.Value.CreatedAt);
+  }
+
 
   public async Task<AuthResponse?> LoginRequestAsync(LoginRequest loginRequest)
   {
@@ -88,11 +126,14 @@ public class AuthService(
       throw new Exception("Invalid password");
     }
 
+    var refreshToken = GenerateRefreshToken();
+    result.Value.RefreshToken = refreshToken;
+    await repository.SaveChangesAsync();
     var response = new AuthResponse
     {
       Admin = new AdminRecord(admin.Id, admin.AdminName, admin.Email, admin.SubjectId, admin.CreatedAt),
       Token = CreateToken(admin),
-      RefreshToken = GenerateRefreshToken(),
+      RefreshToken = refreshToken,
       RefreshTokenExpiryTime = null
     };
     return response;
@@ -165,5 +206,46 @@ public class AuthService(
       signingCredentials: creds
     );
     return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+  }
+
+  private string GetCurrentAdminName()
+  {
+    var httpContext = httpContextAccessor.HttpContext;
+    if (httpContext == null)
+    {
+      throw new InvalidOperationException("HttpContext is not available");
+    }
+
+    var adminName = httpContext.User.FindFirstValue(ClaimTypes.Name);
+
+    if (string.IsNullOrEmpty(adminName))
+    {
+      throw new Exception("Admin name claim not found in context");
+    }
+
+    return adminName;
+  }
+
+  private int GetCurrentAdminId()
+  {
+    var httpContext = httpContextAccessor.HttpContext;
+    if (httpContext == null)
+    {
+      throw new InvalidOperationException("HttpContext is not available");
+    }
+
+    var adminIdString = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    if (string.IsNullOrEmpty(adminIdString))
+    {
+      throw new Exception("Admin ID claim not found in context");
+    }
+
+    if (!int.TryParse(adminIdString, out var adminId))
+    {
+      throw new Exception("Admin ID is not in valid format");
+    }
+
+    return adminId;
   }
 }

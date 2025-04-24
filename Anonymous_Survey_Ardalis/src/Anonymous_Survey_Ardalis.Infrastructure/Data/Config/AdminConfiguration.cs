@@ -9,24 +9,24 @@ public class AdminConfiguration : IEntityTypeConfiguration<Admin>
   public void Configure(EntityTypeBuilder<Admin> builder)
   {
     builder.ToTable("Admins");
-        
+
     builder.HasKey(a => a.Id);
-        
+
     builder.Property(a => a.Email)
       .IsRequired()
       .HasMaxLength(100);
-            
+
     builder.Property(a => a.AdminName)
       .IsRequired()
       .HasMaxLength(50);
-            
+
     builder.Property(a => a.PasswordHash)
       .IsRequired()
       .HasMaxLength(128);
-            
+
     builder.HasIndex(a => a.Email)
       .IsUnique();
-            
+
     // Relationship with Comments (if applicable)
     // builder.HasMany(a => a.Comments)
     //     .WithOne(c => c.Admin)

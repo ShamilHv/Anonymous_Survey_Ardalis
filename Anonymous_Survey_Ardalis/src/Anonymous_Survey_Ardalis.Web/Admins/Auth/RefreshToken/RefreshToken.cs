@@ -1,4 +1,3 @@
-using Anonymous_Survey_Ardalis.Web.Admins.Auth.Login;
 using Anonymous_Survey_Ardalis.Web.Security;
 using FastEndpoints;
 
@@ -21,11 +20,9 @@ public class RefreshToken(IAuthService authService)
     RefreshTokenRequest request,
     CancellationToken cancellationToken)
   {
-    var tokenResponse =await authService.RefreshTokensAsync(request.TokenRequest);
+    var tokenResponse = await authService.RefreshTokensAsync(request.TokenRequest);
 
-    var response = new RefreshTokenResponse()
-    {
-      TokenResponse = tokenResponse!
-    };
+    var response = new RefreshTokenResponse { TokenResponse = tokenResponse! };
+    await SendAsync(response!, cancellation: cancellationToken);
   }
 }

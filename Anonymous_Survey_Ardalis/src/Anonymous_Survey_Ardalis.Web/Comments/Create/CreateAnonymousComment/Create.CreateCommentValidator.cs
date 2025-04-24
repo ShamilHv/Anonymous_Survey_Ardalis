@@ -1,7 +1,7 @@
 using FastEndpoints;
 using FluentValidation;
 
-namespace Anonymous_Survey_Ardalis.Web.Comments;
+namespace Anonymous_Survey_Ardalis.Web.Comments.Create.CreateAnonymousComment;
 
 public class CreateCommentValidator : Validator<CreateCommentRequest>
 {

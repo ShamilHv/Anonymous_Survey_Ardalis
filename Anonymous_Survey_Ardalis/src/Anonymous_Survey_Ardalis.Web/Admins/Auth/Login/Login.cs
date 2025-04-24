@@ -1,14 +1,10 @@
-using Anonymous_Survey_Ardalis.UseCases.Admins.Commands.Create;
-using Anonymous_Survey_Ardalis.Web.Admins.Auth.Register;
 using Anonymous_Survey_Ardalis.Web.Security;
-using Azure;
 using FastEndpoints;
-using MediatR;
 
 namespace Anonymous_Survey_Ardalis.Web.Admins.Auth.Login;
 
 public class Login(IAuthService authService)
-  : Endpoint<LoginRequest, LoginResponse>
+  : Endpoint<LoginRequest, AuthResponse>
 {
   public override void Configure()
   {
@@ -16,7 +12,11 @@ public class Login(IAuthService authService)
     AllowAnonymous();
     Summary(s =>
     {
-      s.ExampleRequest = new LoginRequest();
+      s.ExampleRequest = new LoginRequest()
+      {
+        Email = "admim@mail.com",
+        Password = "Admin@123"
+      };
     });
   }
 
@@ -24,11 +24,12 @@ public class Login(IAuthService authService)
     LoginRequest request,
     CancellationToken cancellationToken)
   {
-    var authResponse =await authService.LoginRequestAsync(request);
+    var authResponse = await authService.LoginRequestAsync(request);
+    await SendAsync(authResponse!, cancellation: cancellationToken);
 
-    var response = new LoginResponse()
-    {
-      AuthResponse = authResponse!
-    };
+    // var response = new LoginResponse()
+    // {
+    //   AuthResponse = authResponse!
+    // };
   }
 }

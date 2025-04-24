@@ -2,7 +2,7 @@ using Anonymous_Survey_Ardalis.UseCases.Comments.Commands.Create;
 using FastEndpoints;
 using MediatR;
 
-namespace Anonymous_Survey_Ardalis.Web.Comments;
+namespace Anonymous_Survey_Ardalis.Web.Comments.Create.CreateAnonymousComment;
 
 public class Create(IMediator _mediator)
   : Endpoint<CreateCommentRequest, CreateCommentResponse>
@@ -11,12 +11,13 @@ public class Create(IMediator _mediator)
   {
     Post(CreateCommentRequest.Route);
     AllowAnonymous();
+    AllowFormData(); // Important for file uploads
     Summary(s =>
     {
       s.ExampleRequest = new CreateCommentRequest { SubjectId = 1 };
+      // Remove the problematic RequestParam line
     });
   }
-
   public override async Task HandleAsync(
     CreateCommentRequest request,
     CancellationToken cancellationToken)
@@ -26,7 +27,11 @@ public class Create(IMediator _mediator)
 
     if (result.IsSuccess)
     {
-      Response = new CreateCommentResponse(request.SubjectId, request.CommentText) { CommentId = result.Value };
+      Response = new CreateCommentResponse(request.SubjectId, request.CommentText) 
+      { 
+        CommentId = result.Value,
+        HasFile = request.File != null
+      };
     }
   }
 }
