@@ -12,17 +12,20 @@ public class GetCommentWithRepliesHandler(IReadRepository<Comment> repository)
   public async Task<Result<CommentWithRepliesDto>> Handle(GetCommentWithRepliesQuery request,
     CancellationToken cancellationToken)
   {
+    var specForComment = new CommentByIdSpec(request.CommentId);
+    var comment= await repository.FirstOrDefaultAsync(specForComment, cancellationToken);
     var spec = new CommentWithRepliesSpec(request.CommentId);
     var replies = await repository.ListAsync(spec, cancellationToken);
 
-    if (replies == null || !replies.Any())
+    if (replies == null || comment==null || !replies.Any())
     {
       return Result.NotFound();
     }
 
     var commentDtos = replies.Select(MapToCommentDto).ToList();
 
-    return new CommentWithRepliesDto(commentDtos);
+    return new CommentWithRepliesDto(comment.Id, comment.SubjectId, comment.CommentText, 
+      comment.CreatedAt, comment.ParentCommentId, comment.FileId, comment.IsAdminComment, commentDtos);
   }
 
   private CommentDto MapToCommentDto(Comment comment)
@@ -30,29 +33,4 @@ public class GetCommentWithRepliesHandler(IReadRepository<Comment> repository)
     return new CommentDto(comment.Id, comment.SubjectId, comment.CommentText, comment.CreatedAt,
       comment.ParentCommentId, comment.FileId, comment.IsAdminComment);
   }
-}
-//
-// public class GetCommentWithRepliesHandler(IReadRepository<Comment> repository)
-//   : IRequestHandler<GetCommentWithRepliesQuery, Result<CommentWithRepliesDto>>
-// {
-//   public async Task<Result<CommentWithRepliesDto>> Handle(GetCommentWithRepliesQuery request, CancellationToken cancellationToken)
-//   {
-//     var spec = new CommentWithRepliesSpec(request.CommentId);
-//     var comment = await repository.FirstOrDefaultAsync(spec, cancellationToken);
-//     if (comment == null)
-//     {
-//       return Result.NotFound();
-//     }
-//     
-//     var commentDtos = comment.ChildComments.Select(MapToCommentDto).ToList();
-//     
-//     return new CommentWithRepliesDto(commentDtos);
-//   }
-//   
-//   private CommentDto MapToCommentDto(Comment comment)
-//   {
-//     return new CommentDto(comment.Id, comment.SubjectId, comment.CommentText, comment.CreatedAt,
-//       comment.ParentCommentId, comment.FileId, comment.IsAdminComment);
-//
-//   }
-// }
+} 

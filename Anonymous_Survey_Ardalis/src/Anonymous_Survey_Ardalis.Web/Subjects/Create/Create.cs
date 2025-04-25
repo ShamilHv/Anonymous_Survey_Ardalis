@@ -1,4 +1,6 @@
 using Anonymous_Survey_Ardalis.UseCases.Subjects.Commands.Create;
+using Ardalis.GuardClauses;
+using Ardalis.Result;
 using FastEndpoints;
 using MediatR;
 
@@ -23,7 +25,13 @@ public class Create(IMediator _mediator)
   {
     var result = await _mediator.Send(new CreateSubjectCommand(request.SubjectName,
       request.DepartmentId), cancellationToken);
-
+    if (result.IsNotFound())
+    {
+      await SendNotFoundAsync(cancellation: cancellationToken);
+      return;    }
+    {
+      
+    }
     if (result.IsSuccess)
     {
       Response = new CreateSubjectResponse(request.DepartmentId, request.SubjectName)

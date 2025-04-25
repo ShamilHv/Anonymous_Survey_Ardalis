@@ -1,4 +1,6 @@
+using Anonymous_Survey_Ardalis.Core.Exceptions;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Commands.Create;
+using Ardalis.Result;
 using FastEndpoints;
 using MediatR;
 
@@ -22,15 +24,31 @@ public class Create(IMediator _mediator)
     CreateCommentRequest request,
     CancellationToken cancellationToken)
   {
-    var result = await _mediator.Send(new CreateCommentCommand(request.SubjectId,
-      request.CommentText, request.File), cancellationToken);
-
-    if (result.IsSuccess)
+    try
     {
-      Response = new CreateCommentResponse(request.SubjectId, request.CommentText)
+      var result = await _mediator.Send(new CreateCommentCommand(request.SubjectId,
+        request.CommentText, request.File), cancellationToken);
+
+      if (result.IsSuccess)
       {
-        CommentId = result.Value, HasFile = request.File != null
-      };
+        Response = new CreateCommentResponse(request.SubjectId, request.CommentText)
+        {
+          CommentId = result.Value, 
+          HasFile = request.File != null
+        };
+      }
+    }
+    catch (ResourceNotFoundException ex)
+    {
+      ThrowError(ex.Message);
+      await SendErrorsAsync(statusCode: 404, cancellation: cancellationToken);
+      return;
+    }
+    catch (Exception ex)
+    {
+      ThrowError(ex.Message);
+      await SendErrorsAsync(statusCode: 500, cancellation: cancellationToken);
+      return;
     }
   }
 }

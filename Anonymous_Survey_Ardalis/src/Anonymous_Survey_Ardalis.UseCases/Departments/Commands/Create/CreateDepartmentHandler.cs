@@ -9,6 +9,7 @@ public class CreateDepartmentHandler(IRepository<Department> _repository)
 {
   public async Task<Result<int>> Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
   {
+    
     var newDepartment = new Department(request.DepartmentName);
 
     await _repository.AddAsync(newDepartment, cancellationToken);

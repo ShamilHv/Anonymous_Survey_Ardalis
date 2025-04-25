@@ -5,6 +5,7 @@
     <PackageReference Include="Ardalis.SharedKernel"/>
     <PackageReference Include="Ardalis.Specification.EntityFrameworkCore"/>
     <PackageReference Include="Azure.Identity"/>
+    <PackageReference Include="FastEndpoints" />
     <PackageReference Include="MailKit"/>
     <PackageReference Include="MediatR"/>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer"/>
