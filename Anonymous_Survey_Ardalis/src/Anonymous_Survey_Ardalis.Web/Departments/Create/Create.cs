@@ -1,6 +1,7 @@
 using Anonymous_Survey_Ardalis.UseCases.Departments.Commands.Create;
 using FastEndpoints;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Anonymous_Survey_Ardalis.Web.Departments;
 
@@ -17,6 +18,7 @@ public class Create(IMediator _mediator)
     });
   }
 
+  [Authorize(Policy = "DepartmentAdminOrHigher")]
   public override async Task HandleAsync(
     CreateDepartmentRequest request,
     CancellationToken cancellationToken)

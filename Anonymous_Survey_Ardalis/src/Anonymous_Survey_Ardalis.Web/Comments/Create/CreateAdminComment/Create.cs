@@ -1,5 +1,6 @@
 using Anonymous_Survey_Ardalis.UseCases.Comments.Commands.Create.CreateAdminComment;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Queries.Get;
+using Ardalis.Result;
 using FastEndpoints;
 using MediatR;
 
@@ -26,7 +27,7 @@ public class Create(IMediator _mediator)
 
     var comment = await _mediator.Send(query, cancellationToken);
 
-    if (comment == null)
+    if (comment.IsNotFound())
     {
       throw new Exception("Comment not found");
     }

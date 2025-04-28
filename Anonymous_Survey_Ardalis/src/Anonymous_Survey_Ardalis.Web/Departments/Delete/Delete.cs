@@ -2,6 +2,7 @@ using Anonymous_Survey_Ardalis.UseCases.Departments.Commands.Delete;
 using Ardalis.Result;
 using FastEndpoints;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Anonymous_Survey_Ardalis.Web.Departments;
 
@@ -13,6 +14,7 @@ public class Delete(IMediator _mediator)
     Delete(DeleteDepartmentRequest.Route);
   }
 
+  [Authorize(Policy = "DepartmentAdminOrHigher")]
   public override async Task HandleAsync(
     DeleteDepartmentRequest request,
     CancellationToken cancellationToken)

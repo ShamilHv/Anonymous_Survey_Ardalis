@@ -1,5 +1,6 @@
 using Anonymous_Survey_Ardalis.Web.Security;
 using FastEndpoints;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Anonymous_Survey_Ardalis.Web.Admins.Auth.Register;
 
@@ -9,7 +10,6 @@ public class Register(IAuthService authService)
   public override void Configure()
   {
     Post("/Auth/Register");
-    AllowAnonymous();
     AllowFormData();
     Summary(s =>
     {
@@ -20,6 +20,7 @@ public class Register(IAuthService authService)
     });
   }
 
+  [Authorize(Policy = "SuperAdminOnly")]
   public override async Task HandleAsync(
     AuthRequest request,
     CancellationToken cancellationToken)
