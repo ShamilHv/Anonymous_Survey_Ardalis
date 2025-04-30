@@ -15,10 +15,7 @@ public class RegisterAdminValidator : Validator<AuthRequest>
     RuleFor(x => x.AdminName)
       .NotEmpty()
       .WithMessage("Name is required");
-    RuleFor(x => x.SubjectId)
-      .NotEmpty()
-      .GreaterThan(0)
-      .WithMessage("Invalid Subject Id");
+
     RuleFor(x => x.Password)
       .NotEmpty().WithMessage("Password is required")
       .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$")

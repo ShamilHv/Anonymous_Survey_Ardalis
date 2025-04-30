@@ -1,4 +1,6 @@
+using Anonymous_Survey_Ardalis.Core.Interfaces;
 using Anonymous_Survey_Ardalis.UseCases.Subjects.Commands.Create;
+using Anonymous_Survey_Ardalis.Web.Security;
 using Ardalis.GuardClauses;
 using Ardalis.Result;
 using FastEndpoints;
@@ -6,7 +8,7 @@ using MediatR;
 
 namespace Anonymous_Survey_Ardalis.Web.Subjects;
 
-public class Create(IMediator _mediator)
+public class Create(IMediator _mediator, IAdminPermissionService _adminPermissionService, ICurrentUserService _currentUserService)
   : Endpoint<CreateSubjectRequest, CreateSubjectResponse>
 {
   public override void Configure()
@@ -19,10 +21,17 @@ public class Create(IMediator _mediator)
     });
   }
 
-  public override async Task HandleAsync(
+  public  override async Task HandleAsync(
     CreateSubjectRequest request,
     CancellationToken cancellationToken)
   {
+    var adminId = _currentUserService.GetCurrentAdminId();
+    if (!await _adminPermissionService.CanCreateSubject(adminId, request.DepartmentId))
+    {
+      await SendForbiddenAsync();
+      return;
+    }
+    
     var result = await _mediator.Send(new CreateSubjectCommand(request.SubjectName,
       request.DepartmentId), cancellationToken);
     if (result.IsNotFound())

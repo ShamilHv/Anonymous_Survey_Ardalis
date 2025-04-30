@@ -1,4 +1,6 @@
+using Anonymous_Survey_Ardalis.Core.Interfaces;
 using Anonymous_Survey_Ardalis.UseCases.Departments.Commands.Delete;
+using Anonymous_Survey_Ardalis.Web.Security;
 using Ardalis.Result;
 using FastEndpoints;
 using MediatR;
@@ -6,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Anonymous_Survey_Ardalis.Web.Departments;
 
-public class Delete(IMediator _mediator)
+public class Delete(IMediator _mediator, IAdminPermissionService _adminPermissionService, ICurrentUserService _currentUserService)
   : Endpoint<DeleteDepartmentRequest>
 {
   public override void Configure()
@@ -19,6 +21,12 @@ public class Delete(IMediator _mediator)
     DeleteDepartmentRequest request,
     CancellationToken cancellationToken)
   {
+    var adminId = _currentUserService.GetCurrentAdminId();
+    if (!await _adminPermissionService.CanModifyDepartment(adminId))
+    {
+      await SendForbiddenAsync();
+      return;
+    }
     var command = new DeleteDepartmentCommand(request.DepartmentId);
 
     var result = await _mediator.Send(command, cancellationToken);

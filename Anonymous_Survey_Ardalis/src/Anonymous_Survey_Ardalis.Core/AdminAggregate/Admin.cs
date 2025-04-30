@@ -22,7 +22,7 @@ namespace Anonymous_Survey_Ardalis.Core.AdminAggregate;
 
 public class Admin : EntityBase, IAggregateRoot
 {
-  public Admin(string adminName, string email, int subjectId, AdminRole role = AdminRole.SubjectAdmin)
+  public Admin(string adminName, string email, int? subjectId, AdminRole role = AdminRole.SubjectAdmin)
   {
     AdminName = adminName;
     Email = email;
@@ -34,7 +34,7 @@ public class Admin : EntityBase, IAggregateRoot
   public string AdminName { get; set; }
   public string Email { get; set; }
   public string PasswordHash { get; set; } = string.Empty;
-  public int SubjectId { get; set; }
+  public int? SubjectId { get; set; }
   public int? DepartmentId { get; set; }  
   public AdminRole Role { get; set; }
   public DateTime CreatedAt { get; set; }

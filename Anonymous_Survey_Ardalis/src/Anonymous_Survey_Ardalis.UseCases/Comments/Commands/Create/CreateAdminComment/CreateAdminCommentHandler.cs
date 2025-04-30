@@ -11,8 +11,7 @@ namespace Anonymous_Survey_Ardalis.UseCases.Comments.Commands.Create.CreateAdmin
 
 public class CreateAdminCommentHandler(
   IRepository<Comment> _repository, 
-  IHttpContextAccessor httpContextAccessor,
-  IAdminPermissionService _permissionService) // Add permission service
+  IHttpContextAccessor httpContextAccessor) // Add permission service
   : ICommandHandler<CreateAdminCommentCommand, Result<Comment>>
 {
   public async Task<Result<Comment>> Handle(CreateAdminCommentCommand request, CancellationToken cancellationToken)
@@ -27,13 +26,6 @@ public class CreateAdminCommentHandler(
     // Get the current admin ID
     var adminId = GetCurrentAdminId();
     
-    // Check if the admin has permission to comment on this subject
-    bool canComment = await _permissionService.CanCommentOnSubject(adminId, request.SubjectId);
-    if (!canComment)
-    {
-      return Result.Forbidden("You don't have permission to comment on this subject");
-    }
-
     var adminComment = new Comment(comment.SubjectId, request.CommentText)
     {
       IsAdminComment = true,

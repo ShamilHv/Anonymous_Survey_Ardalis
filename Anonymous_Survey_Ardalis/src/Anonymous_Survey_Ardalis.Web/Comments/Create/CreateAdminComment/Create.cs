@@ -1,12 +1,15 @@
+using Anonymous_Survey_Ardalis.Core.Interfaces;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Commands.Create.CreateAdminComment;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Queries.Get;
+using Anonymous_Survey_Ardalis.Web.Security;
 using Ardalis.Result;
 using FastEndpoints;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Anonymous_Survey_Ardalis.Web.Comments.Create.CreateAdminComment;
 
-public class Create(IMediator _mediator)
+public class Create(IMediator _mediator, IAdminPermissionService _adminPermissionService, ICurrentUserService _currentUserService)
   : Endpoint<CreateAdminCommentRequest, CreateAdminCommentResponse>
 {
   public override void Configure()
@@ -18,11 +21,18 @@ public class Create(IMediator _mediator)
       s.ExampleRequest = new CreateAdminCommentRequest { CommentText = "Comment text", ParentCommentId = 2 };
     });
   }
-
+  
+  [Authorize(Policy = "SuperAdminOnly")]
   public override async Task HandleAsync(
     CreateAdminCommentRequest request,
     CancellationToken cancellationToken)
   {
+    var adminId = _currentUserService.GetCurrentAdminId();
+    if (!await _adminPermissionService.CanCommentOnSubject(adminId, request.ParentCommentId))
+    {
+      await SendForbiddenAsync();
+      return;
+    }
     var query = new GetCommentQuery(request.ParentCommentId);
 
     var comment = await _mediator.Send(query, cancellationToken);

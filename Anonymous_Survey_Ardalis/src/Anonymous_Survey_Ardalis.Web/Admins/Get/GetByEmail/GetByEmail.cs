@@ -1,3 +1,4 @@
+using Anonymous_Survey_Ardalis.Core.AdminAggregate;
 using Anonymous_Survey_Ardalis.UseCases.Admins.Queries.Get;
 using Ardalis.Result;
 using FastEndpoints;
@@ -28,7 +29,7 @@ public class GetByEmail(IMediator mediator) : Endpoint<GetAdminByEmailRequest, A
     if (result.IsSuccess)
     {
       Response = new AdminRecord(result.Value.Id, result.Value.AdminName, result.Value.Email, result.Value.SubjectId,
-        result.Value.CreatedAt);
+        result.Value.CreatedAt, result.Value.Role);
     }
   }
 }

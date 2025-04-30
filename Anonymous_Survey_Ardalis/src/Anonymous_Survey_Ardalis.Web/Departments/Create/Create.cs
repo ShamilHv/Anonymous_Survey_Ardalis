@@ -1,11 +1,13 @@
+using Anonymous_Survey_Ardalis.Core.Interfaces;
 using Anonymous_Survey_Ardalis.UseCases.Departments.Commands.Create;
+using Anonymous_Survey_Ardalis.Web.Security;
 using FastEndpoints;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Anonymous_Survey_Ardalis.Web.Departments;
 
-public class Create(IMediator _mediator)
+public class Create(IMediator _mediator, IAdminPermissionService _adminPermissionService, ICurrentUserService _currentUserService)
   : Endpoint<CreateDepartmentRequest, CreateDepartmentResponse>
 {
   public override void Configure()
@@ -18,11 +20,18 @@ public class Create(IMediator _mediator)
     });
   }
 
-  [Authorize(Policy = "DepartmentAdminOrHigher")]
+  [Authorize(Policy = "SuperAdminOnly")]
   public override async Task HandleAsync(
     CreateDepartmentRequest request,
     CancellationToken cancellationToken)
   {
+    var adminId = _currentUserService.GetCurrentAdminId();
+    if (!await _adminPermissionService.CanModifyDepartment(adminId))
+    {
+      await SendForbiddenAsync();
+      return;
+    }
+
     var result = await _mediator.Send(new CreateDepartmentCommand(request.DepartmentName), cancellationToken);
 
     if (result.IsSuccess)
