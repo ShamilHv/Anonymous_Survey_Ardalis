@@ -28,7 +28,7 @@ public class GetById(IMediator mediator) : Endpoint<GetAdminByIdRequest, AdminRe
     if (result.IsSuccess)
     {
       Response = new AdminRecord(result.Value.Id, result.Value.AdminName, result.Value.Email, result.Value.SubjectId,
-        result.Value.CreatedAt, result.Value.Role);
+        result.Value.DepartmentId, result.Value.CreatedAt, result.Value.Role);
     }
   }
 }

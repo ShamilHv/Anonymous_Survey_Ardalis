@@ -7,9 +7,8 @@ public class GetCommentWithRepliesValidator : Validator<GetCommentWithRepliesReq
 {
   public GetCommentWithRepliesValidator()
   {
-    RuleFor(x => x.CommentId)
+    RuleFor(x => x.CommentGuid)
       .NotEmpty()
-      .GreaterThan(0)
-      .WithMessage("Id must be greater than zero.");
+      .WithMessage("Comment Guid cannot be empty");
   }
 }

@@ -18,7 +18,7 @@ public class GetWithReplies(IMediator _mediator)
   public override async Task HandleAsync(GetCommentWithRepliesRequest request,
     CancellationToken cancellationToken)
   {
-    var query = new GetCommentWithRepliesQuery(request.CommentId);
+    var query = new GetCommentWithRepliesQuery(request.CommentGuid);
 
     var result = await _mediator.Send(query, cancellationToken);
 

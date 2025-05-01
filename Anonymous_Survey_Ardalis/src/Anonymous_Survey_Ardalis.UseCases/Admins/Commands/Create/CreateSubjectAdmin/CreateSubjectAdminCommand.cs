@@ -4,5 +4,5 @@ using Ardalis.SharedKernel;
 
 namespace Anonymous_Survey_Ardalis.UseCases.Admins.Commands.Create;
 
-public record CreateAdminCommand(string AdminName, string Email, int SubjectId, string Password)
+public record CreateSubjectAdminCommand(string AdminName, string Email, int SubjectId, string Password)
   : ICommand<Result<Admin>>;

@@ -41,7 +41,7 @@ public class Register(IAuthService authService, IAdminPermissionService _adminPe
         AuthResponse = new AuthResponse
         {
           Admin = new AdminRecord(admin.Id, admin.AdminName, admin.Email,
-            admin.SubjectId, admin.CreatedAt, admin.Role),
+            admin.SubjectId, admin.DepartmentId, admin.CreatedAt, admin.Role),
           RefreshToken = admin.RefreshToken
         }
       };

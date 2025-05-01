@@ -22,7 +22,6 @@ public class Create(IMediator _mediator, IAdminPermissionService _adminPermissio
     });
   }
   
-  [Authorize(Policy = "SuperAdminOnly")]
   public override async Task HandleAsync(
     CreateAdminCommentRequest request,
     CancellationToken cancellationToken)
@@ -39,7 +38,8 @@ public class Create(IMediator _mediator, IAdminPermissionService _adminPermissio
 
     if (comment.IsNotFound())
     {
-      throw new Exception("Comment not found");
+      await SendNotFoundAsync();
+      return;
     }
 
     var result = await _mediator.Send(new CreateAdminCommentCommand(request.ParentCommentId,

@@ -12,9 +12,9 @@ public class GetCommentWithRepliesHandler(IReadRepository<Comment> repository)
   public async Task<Result<CommentWithRepliesDto>> Handle(GetCommentWithRepliesQuery request,
     CancellationToken cancellationToken)
   {
-    var specForComment = new CommentByIdSpec(request.CommentId);
+    var specForComment = new CommentByGuidSpec(request.CommentIdentifier);
     var comment= await repository.FirstOrDefaultAsync(specForComment, cancellationToken);
-    var spec = new CommentWithRepliesSpec(request.CommentId);
+    var spec = new CommentWithRepliesSpec(request.CommentIdentifier);
     var replies = await repository.ListAsync(spec, cancellationToken);
 
     if (replies == null || comment==null || !replies.Any())

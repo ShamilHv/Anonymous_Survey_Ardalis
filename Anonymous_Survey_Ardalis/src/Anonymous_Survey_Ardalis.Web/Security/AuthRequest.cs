@@ -8,6 +8,7 @@ namespace Anonymous_Survey_Ardalis.Web.Security;
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public int? SubjectId { get; set; } = null;
-    public AdminRole Role { get; set; } = AdminRole.SubjectAdmin;
+    public int? DepartmentId { get; set; } = null;
+    // public AdminRole Role { get; set; } = AdminRole.SubjectAdmin;
   }
 

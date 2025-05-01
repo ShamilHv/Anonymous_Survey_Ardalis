@@ -52,6 +52,63 @@ public class AdminPermissionService : IAdminPermissionService
         } 
         
         return false;
+    } 
+    public async Task<bool> CanGetComments(int adminId, int? departmentId, int? subjectId)
+    {
+        var adminSpec = new AdminByIdSpec(adminId);
+        var admin = await _adminRepository.FirstOrDefaultAsync(adminSpec);
+        if (admin == null) throw new Exception("Can't find admin");
+        
+        if (admin.Role == AdminRole.SuperAdmin) 
+        {
+            if (departmentId.HasValue && subjectId.HasValue)
+            {
+                var subject = await _subjectRepository.GetByIdAsync(subjectId.Value);
+                if (subject == null) throw new Exception("Can't find subject");
+                
+                if (subject.DepartmentId != departmentId.Value)
+                    throw new Exception("Subject does not belong to the specified department");
+            }
+            
+            return true;
+        }
+        
+        if (admin.Role == AdminRole.SubjectAdmin)
+        {
+            if (subjectId.HasValue && subjectId.Value != admin.SubjectId)
+                return false;
+                
+            if (departmentId.HasValue)
+            {
+              if (admin.SubjectId != null)
+              {
+                var subject = await _subjectRepository.GetByIdAsync(admin.SubjectId.Value);
+                if (subject == null) throw new Exception("Can't find subject");
+
+                return subject.DepartmentId == departmentId.Value;
+              }
+            }
+            
+            return true; 
+        }
+        
+        if (admin.Role == AdminRole.DepartmentAdmin)
+        {
+            if (departmentId.HasValue && departmentId.Value != admin.DepartmentId)
+                return false;
+                
+            if (subjectId.HasValue)
+            {
+                var subject = await _subjectRepository.GetByIdAsync(subjectId.Value);
+                if (subject == null) throw new Exception("Can't find subject");
+                
+                return subject.DepartmentId == admin.DepartmentId;
+            }
+            
+            return true; 
+        }
+        
+        return false;
     }
 
     public async Task<bool> CanCreateAdmin(int adminId)

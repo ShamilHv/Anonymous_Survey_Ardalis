@@ -24,8 +24,4 @@
     <ProjectReference Include="..\Anonymous_Survey_Ardalis.Core\Anonymous_Survey_Ardalis.Core.csproj"/>
     <ProjectReference Include="..\Anonymous_Survey_Ardalis.UseCases\Anonymous_Survey_Ardalis.UseCases.csproj"/>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\Migrations\"/>
-  </ItemGroup>
 </Project>

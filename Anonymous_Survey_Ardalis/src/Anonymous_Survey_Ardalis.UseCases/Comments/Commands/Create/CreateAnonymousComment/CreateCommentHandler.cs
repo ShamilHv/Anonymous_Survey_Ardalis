@@ -12,9 +12,9 @@ using File = Anonymous_Survey_Ardalis.Core.CommentAggregate.File;
 namespace Anonymous_Survey_Ardalis.UseCases.Comments.Commands.Create;
 
 public class CreateCommentHandler(IRepository<Comment> _repository, IRepository<Subject> subjectRepository, IRepository<File> _fileRepository)
-  : ICommandHandler<CreateCommentCommand, Result<int>>
+  : ICommandHandler<CreateCommentCommand, Result<Guid>>
 {
-  public async Task<Result<int>> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
+  public async Task<Result<Guid>> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
   {
     
     var spec = new SubjectByIdSpec(request.SubjectId);
@@ -36,7 +36,7 @@ public class CreateCommentHandler(IRepository<Comment> _repository, IRepository<
     await _repository.AddAsync(newComment, cancellationToken);
     await _repository.SaveChangesAsync(cancellationToken);
 
-    return newComment.Id;
+    return newComment.CommentIdentifier;
   }
 
   private async Task<File> UploadFileAsync(IFormFile file, CancellationToken cancellationToken)

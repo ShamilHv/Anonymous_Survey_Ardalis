@@ -29,13 +29,8 @@ public static async Task Initialize(IServiceProvider serviceProvider, bool isDev
             
             var department = await EnsureDepartmentExists(dbContext);
             var subject = await EnsureSubjectExists(dbContext, department.Id);
-            
-            var superAdmin = new Admin("SuperAdmin", "shamil@mail.com", subject.Id, AdminRole.SuperAdmin)
-            {
-                DepartmentId = department.Id,
-                CreatedAt = DateTime.UtcNow
-            };
-            
+
+            var superAdmin = Admin.CreateSuperAdmin("SuperAdmin", "shamil@mail.com");
             superAdmin.PasswordHash = passwordHasher.HashPassword(superAdmin, "Sh@mil123");
             
             dbContext.Admins.Add(superAdmin);

@@ -7,6 +7,8 @@ namespace Anonymous_Survey_Ardalis.Core.CommentAggregate;
 
 public class Comment(int subjectId, string commentText) : EntityBase, IAggregateRoot
 {
+  public Guid CommentIdentifier { get; set; } = Guid.NewGuid();
+
   public int SubjectId { get; set; } = subjectId;
   public string CommentText { get; set; } = Guard.Against.NullOrEmpty(commentText, nameof(CommentText));
 

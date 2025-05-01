@@ -5,6 +5,7 @@ using Anonymous_Survey_Ardalis.Web.Security;
 using Ardalis.Result;
 using FastEndpoints;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Anonymous_Survey_Ardalis.Web.Comments.Create.CreateAnonymousComment;
 
@@ -33,11 +34,7 @@ public class Create(IMediator _mediator)
 
       if (result.IsSuccess)
       {
-        Response = new CreateCommentResponse(request.SubjectId, request.CommentText)
-        {
-          CommentId = result.Value, 
-          HasFile = request.File != null
-        };
+        Response = new CreateCommentResponse("https://localhost:57679/Comments/"+result.Value);
       }
     }
     catch (ResourceNotFoundException ex)
