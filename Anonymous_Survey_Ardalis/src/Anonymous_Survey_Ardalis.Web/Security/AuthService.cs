@@ -26,6 +26,7 @@ public class AuthService : IAuthService
   private readonly IPasswordHasher<Admin> _passwordHasher;
   private readonly IAdminPermissionService _permissionService;
   private readonly IRepository<Admin> _repository;
+  private readonly IEmailSender _emailSender;
 
   public AuthService(
     IMediator mediator,
@@ -33,7 +34,8 @@ public class AuthService : IAuthService
     IPasswordHasher<Admin> passwordHasher,
     IConfiguration configuration,
     ICurrentUserService currentUserService,
-    IAdminPermissionService permissionService)
+    IAdminPermissionService permissionService,
+    IEmailSender emailSender)
   {
     _mediator = mediator;
     _repository = repository;
@@ -41,6 +43,7 @@ public class AuthService : IAuthService
     _configuration = configuration;
     _currentUserService = currentUserService;
     _permissionService = permissionService;
+    _emailSender = emailSender;
   }
 
   public async Task<AdminRecord> GetCurrentAdmin()
@@ -110,184 +113,40 @@ public class AuthService : IAuthService
       // Both IDs are null or zero - create Super Admin
       newAdmin = Admin.CreateSuperAdmin(request.AdminName, request.Email);
     }
+    
+    string  password = PasswordGenerator.GenerateSecurePassword();
+    bool isGeneratedPassword = false;
+    
+    password = PasswordGenerator.GenerateSecurePassword();
+    isGeneratedPassword = true;
+    
 
     // Set password hash
-    var passwordHash = _passwordHasher.HashPassword(newAdmin, request.Password);
+    var passwordHash = _passwordHasher.HashPassword(newAdmin, password);
     newAdmin.PasswordHash = passwordHash!;
 
     // Save to repository
     var addedAdmin = await _repository.AddAsync(newAdmin);
     await _repository.SaveChangesAsync();
 
+    // Send welcome email with password if it was generated
+    if (isGeneratedPassword)
+    {
+      try
+      {
+        await _emailSender.SendWelcomeEmailAsync(addedAdmin, password);
+      }
+      catch (Exception ex)
+      {
+        // Log the error but don't fail the user creation
+        // Consider adding proper logging here
+        Console.WriteLine($"Failed to send welcome email: {ex.Message}");
+      }
+    }
+
     return addedAdmin;
   }
-// public async Task<Admin?> RegisterAsync(AuthRequest request)
-// {
-//     var result = await _mediator.Send(new GetAdminByEmailQuery(request.Email));
-//     
-//     if (!result.IsNotFound())
-//     {
-//         throw new Exception("Admin with this email already exists");
-//     }
-//     
-//     // Check if current admin has permission to create new admins
-//     var currentAdminId = _currentUserService.GetCurrentAdminId();
-//     
-//     if (!await _permissionService.CanCreateAdmin(currentAdminId))
-//     {
-//         throw new Exception("Current admin does not have permission to create new admins");
-//     }
-//     
-//     // Determine admin type based on provided IDs
-//     Admin newAdmin;
-//
-//     // First, handle the case where we have a specific priority:
-//     // 1. If DepartmentId is provided, it takes precedence (create Department Admin)
-//     // 2. If only SubjectId is provided, create Subject Admin
-//     // 3. If both are null, create Super Admin
-//     
-//     if (request.DepartmentId.HasValue)
-//     {
-//         // Verify department exists
-//         var departmentResult = (await _mediator.Send(new GetDepartmentQuery(request.DepartmentId.Value))).Value;
-//         if (departmentResult is null)
-//         {
-//             throw new Exception($"Department id: {request.DepartmentId} is invalid");
-//         }
-//         
-//         newAdmin = Admin.CreateDepartmentAdmin(request.AdminName, request.Email, request.DepartmentId.Value);
-//     }
-//     else if (request.SubjectId.HasValue)
-//     {
-//         var subjectResult = (await _mediator.Send(new GetSubjectQuery(request.SubjectId.Value))).Value;
-//         if (subjectResult is null)
-//         {
-//             throw new Exception($"Subject id: {request.SubjectId} is invalid");
-//         }
-//         
-//         newAdmin = Admin.CreateSubjectAdmin(request.AdminName, request.Email, request.SubjectId.Value);
-//     }
-//     else
-//     {
-//         // Both IDs are null - create Super Admin
-//         newAdmin = Admin.CreateSuperAdmin(request.AdminName, request.Email);
-//     }
-//     
-//     // Set password hash
-//     var passwordHash = _passwordHasher.HashPassword(newAdmin, request.Password);
-//     newAdmin.PasswordHash = passwordHash!;
-//     
-//     // Save to repository
-//     var addedAdmin = await _repository.AddAsync(newAdmin);
-//     await _repository.SaveChangesAsync();
-//     
-//     return addedAdmin;
-// }
-//     public async Task<Admin?> RegisterAsync(AuthRequest request)
-// {
-//     var result = await _mediator.Send(new GetAdminByEmailQuery(request.Email));
-//     
-//     if (!result.IsNotFound())
-//     {
-//         throw new Exception("Admin with this email already exists");
-//     }
-//     
-//     // Check if current admin has permission to create new admins
-//     var currentAdminId = _currentUserService.GetCurrentAdminId();
-//     
-//     if (!await _permissionService.CanCreateAdmin(currentAdminId))
-//     {
-//         throw new Exception("Current admin does not have permission to create new admins");
-//     }
-//     
-//     Admin newAdmin;
-//
-//     // Case 1: Subject Admin (SubjectId provided, DepartmentId is null)
-//     if (request.SubjectId.HasValue)
-//     {
-//         var subjectResult = (await _mediator.Send(new GetSubjectQuery(request.SubjectId.Value))).Value;
-//         if (subjectResult is null)
-//         {
-//             throw new Exception($"Subject id: {request.SubjectId} is invalid");
-//         }
-//         
-//         newAdmin = Admin.CreateSubjectAdmin(request.AdminName, request.Email, request.SubjectId.Value);
-//     }
-//     else if (request.DepartmentId.HasValue)
-//     {
-//         var departmentResult = (await _mediator.Send(new GetDepartmentQuery(request.DepartmentId.Value))).Value;
-//         if (departmentResult is null)
-//         {
-//             throw new Exception($"Department id: {request.DepartmentId} is invalid");
-//         }
-//         
-//         newAdmin = Admin.CreateDepartmentAdmin(request.AdminName, request.Email, request.DepartmentId.Value);
-//     }
-//     else
-//     {
-//         newAdmin = Admin.CreateSuperAdmin(request.AdminName, request.Email);
-//     }
-//     
-//     var passwordHash = _passwordHasher.HashPassword(newAdmin, request.Password);
-//     newAdmin.PasswordHash = passwordHash!;
-//     
-//     var addedAdmin = await _repository.AddAsync(newAdmin);
-//     await _repository.SaveChangesAsync();
-//     
-//     return addedAdmin;
-// }
-  // public async Task<Admin?> RegisterAsync(AuthRequest request)
-  // {
-  //     var result = await _mediator.Send(new GetAdminByEmailQuery(request.Email));
-  //     
-  //
-  //     if (!result.IsNotFound())
-  //     {
-  //         throw new Exception("Admin with this email already exists");
-  //     }
-  //     
-  //     SubjectDto? subjectResult = null;
-  //     if (request.SubjectId is not null)
-  //     {
-  //             subjectResult = (await _mediator.Send(new GetSubjectQuery(request.SubjectId))).Value;
-  //             if (subjectResult is null)
-  //             {
-  //                 throw new Exception($"Subject id: {request.SubjectId} is invalid");
-  //             }
-  //         
-  //     }
-  //     
-  //
-  //     var currentAdminId = _currentUserService.GetCurrentAdminId();
-  //     
-  //     if (!await _permissionService.CanCreateAdmin(currentAdminId))
-  //     {
-  //         throw new Exception("Current admin does not have permission to create new admins");
-  //     }
-  //     
-  //     int? departmentId = null;
-  //     if (request.SubjectId.HasValue && subjectResult != null && 
-  //         (request.Role == AdminRole.DepartmentAdmin))
-  //     {
-  //         var subject = subjectResult;
-  //         departmentId = subject.DepartmentId;
-  //     }
-  //     
-  //     var newAdmin = new Admin(request.AdminName, request.Email, request.SubjectId, request.Role)
-  //     {
-  //         DepartmentId = departmentId
-  //     };
-  //     
-  //     var passwordHash = _passwordHasher.HashPassword(newAdmin, request.Password);
-  //     newAdmin.PasswordHash = passwordHash!;
-  //     newAdmin.CreatedAt = DateTime.UtcNow;
-  //     
-  //     var addedAdmin = await _repository.AddAsync(newAdmin);
-  //     await _repository.SaveChangesAsync();
-  //     
-  //     return addedAdmin;
-  // }
-
+  
   public async Task<AuthResponse?> LoginRequestAsync(LoginRequest loginRequest)
   {
     var result = await _mediator.Send(new GetAdminByEmailQuery(loginRequest.Email));

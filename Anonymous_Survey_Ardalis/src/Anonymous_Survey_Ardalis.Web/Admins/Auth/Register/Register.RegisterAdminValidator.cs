@@ -17,10 +17,5 @@ public class RegisterAdminValidator : Validator<AuthRequest>
       .NotEmpty()
       .WithMessage("Name is required");
 
-    RuleFor(x => x.Password)
-      .NotEmpty().WithMessage("Password is required")
-      .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$")
-      .WithMessage(
-        "Password must be at least 8 characters long and contain an uppercase letter, a lowercase letter, a number, and a special character.");
-  }
+     }
 }

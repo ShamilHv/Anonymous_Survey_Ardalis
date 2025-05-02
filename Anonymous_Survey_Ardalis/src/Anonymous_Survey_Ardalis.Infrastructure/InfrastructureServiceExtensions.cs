@@ -2,6 +2,7 @@
 using Anonymous_Survey_Ardalis.Core.Services;
 using Anonymous_Survey_Ardalis.Infrastructure.Data;
 using Anonymous_Survey_Ardalis.Infrastructure.Data.Queries;
+using Anonymous_Survey_Ardalis.Infrastructure.Email;
 using Anonymous_Survey_Ardalis.UseCases.Admins.Queries.List;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Queries.List;
 using Anonymous_Survey_Ardalis.UseCases.Contributors.List;
@@ -28,6 +29,7 @@ public static class InfrastructureServiceExtensions
     services.AddDbContext<AppDbContext>(options =>
       options.UseSqlServer(connectionString));
 
+
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
       .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
       .AddScoped<IListContributorsQueryService, ListContributorsQueryService>()
@@ -37,7 +39,21 @@ public static class InfrastructureServiceExtensions
       .AddScoped<IListDepartmentQueryService, ListDepartmentsQueryService>()
       .AddScoped<IListAdminsQueryService, ListAdminsQueryService>();
 
+
+    
+    services.AddEmailServices(config);
+
     logger.LogInformation("{Project} services registered", "Infrastructure");
+
+    return services;
+  }
+  private static IServiceCollection AddEmailServices(this IServiceCollection services, IConfiguration configuration)
+  {
+    var mailConfig = new MailserverConfiguration();
+    configuration.GetSection("EmailSettings").Bind(mailConfig);
+    services.AddSingleton(mailConfig);
+
+    services.AddScoped<IEmailSender, EmailSender>();
 
     return services;
   }

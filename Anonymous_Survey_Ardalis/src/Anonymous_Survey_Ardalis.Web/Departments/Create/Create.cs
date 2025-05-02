@@ -1,6 +1,7 @@
 using Anonymous_Survey_Ardalis.Core.Interfaces;
 using Anonymous_Survey_Ardalis.UseCases.CurrentUserServices;
 using Anonymous_Survey_Ardalis.UseCases.Departments.Commands.Create;
+using Ardalis.Result;
 using FastEndpoints;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

@@ -61,40 +61,4 @@ public class CreateCommentHandler(
 
     return new File { FilePath = $"/uploads/{fileName}", UploadedAt = DateTime.UtcNow };
   }
-  // public async Task<Result<int>> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
-  // {
-  //   var newComment = new Comment(request.SubjectId, request.CommentText);
-  //   if (request.File != null)
-  //   {
-  //     UploadFileAsync(request.File);
-  //   }
-  //
-  //   await _repository.AddAsync(newComment, cancellationToken);
-  //   await _repository.SaveChangesAsync(cancellationToken);
-  //
-  //   return await Task.FromResult(new Result<int>(newComment.Id));
-  // }
-  //
-  // public async void UploadFileAsync(IFormFile file)
-  // {
-  //   var desktopPath = "/home/shamil/Desktop";
-  //   var uploadsFolder = Path.Combine(desktopPath, "uploads");
-  //
-  //   if (!Directory.Exists(uploadsFolder))
-  //   {
-  //     Directory.CreateDirectory(uploadsFolder);
-  //   }
-  //
-  //   var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-  //   var filePath = Path.Combine(uploadsFolder, fileName);
-  //
-  //   using (var stream = new FileStream(filePath, FileMode.Create))
-  //   {
-  //     await file.CopyToAsync(stream);
-  //   }
-  //
-  //   var fileEntity = new File { FilePath = $"/uploads/{fileName}", UploadedAt = DateTime.UtcNow };
-  //
-  //   var addedFile = await _fileRepository.AddAsync(fileEntity);
-  // }
 }
