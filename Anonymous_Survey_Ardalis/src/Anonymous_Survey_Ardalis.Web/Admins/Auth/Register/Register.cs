@@ -1,11 +1,15 @@
 using Anonymous_Survey_Ardalis.Core.Interfaces;
+using Anonymous_Survey_Ardalis.UseCases.CurrentUserServices;
 using Anonymous_Survey_Ardalis.Web.Security;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Anonymous_Survey_Ardalis.Web.Admins.Auth.Register;
 
-public class Register(IAuthService authService, IAdminPermissionService _adminPermissionService, ICurrentUserService _currentUserService)
+public class Register(
+  IAuthService authService,
+  IAdminPermissionService _adminPermissionService,
+  ICurrentUserService _currentUserService)
   : Endpoint<AuthRequest, RegisterAdminResponse>
 {
   public override void Configure()
@@ -32,6 +36,7 @@ public class Register(IAuthService authService, IAdminPermissionService _adminPe
       await SendForbiddenAsync();
       return;
     }
+
     var admin = await authService.RegisterAsync(request);
 
     if (admin != null)

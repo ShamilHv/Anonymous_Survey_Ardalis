@@ -1,74 +1,92 @@
+using Anonymous_Survey_Ardalis.Core.AdminAggregate;
 using Anonymous_Survey_Ardalis.Core.Interfaces;
+using Anonymous_Survey_Ardalis.Core.SubjectAggregate;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Queries.List;
-using Anonymous_Survey_Ardalis.Web.Security;
+using Anonymous_Survey_Ardalis.UseCases.CurrentUserServices;
+using Ardalis.SharedKernel;
 using FastEndpoints;
 using MediatR;
 
 namespace Anonymous_Survey_Ardalis.Web.Comments;
 
-public class List(IMediator _mediator) : Endpoint<CommentListRequest, CommentListResponse>
+public class List : Endpoint<CommentListRequest, CommentListResponse>
 {
+  private readonly ICurrentUserService _currentUserService;
+  private readonly IMediator _mediator;
+  private readonly IAdminPermissionService _permissionService;
+  private readonly IReadRepository<Subject> _subjectRepository;
+
+  public List(
+    IMediator mediator,
+    ICurrentUserService currentUserService,
+    IAdminPermissionService permissionService,
+    IReadRepository<Subject> subjectRepository)
+  {
+    _mediator = mediator;
+    _currentUserService = currentUserService;
+    _permissionService = permissionService;
+    _subjectRepository = subjectRepository;
+  }
+
   public override void Configure()
   {
     Get("/Comments");
-    AllowAnonymous();
   }
 
   public override async Task HandleAsync(CommentListRequest request, CancellationToken cancellationToken)
   {
-    
-    var query = new ListCommentsQuery
+    try
     {
-      PageNumber = request.PageNumber,
-      PageSize = request.PageSize,
-      SubjectId = request.SubjectId
-    };
-    
-    var result = await _mediator.Send(query, cancellationToken);
-
-    if (result.IsSuccess)
-    {
-      Response = new CommentListResponse
+      var adminId = _currentUserService.GetCurrentAdminId();
+      var adminRole = _currentUserService.GetCurrentAdminRole();
+      
+      // Super admin specific validations
+      if (adminRole == AdminRole.SuperAdmin && request.SubjectId.HasValue && request.DepartmentId.HasValue)
       {
-        Comments = result.Value.Items.Select(c => 
-          new CommentRecord(c.CommentId, c.CommentText, c.SubjectId)).ToList(),
-        PageNumber = result.Value.PageNumber,
-        PageSize = result.Value.PageSize,
-        TotalPages = result.Value.TotalPages,
-        TotalCount = result.Value.TotalCount
+        var subject = await _subjectRepository.GetByIdAsync(request.SubjectId.Value, cancellationToken);
+        if (subject == null)
+        {
+          ThrowError("Subject not found");
+          return;
+        }
+
+        if (subject.DepartmentId != request.DepartmentId.Value)
+        {
+          ThrowError("Subject does not belong to the specified department");
+          return;
+        }
+      }
+
+      var query = new ListCommentsQuery
+      {
+        PageNumber = request.PageNumber,
+        PageSize = request.PageSize,
+        SubjectId = request.SubjectId,
+        DepartmentId = request.DepartmentId
       };
+
+      var result = await _mediator.Send(query, cancellationToken);
+
+      if (result.IsSuccess)
+      {
+        Response = new CommentListResponse
+        {
+          Comments = result.Value.Items.Select(c =>
+            new CommentRecord(c.CommentId, c.CommentText, c.SubjectId)).ToList(),
+          PageNumber = result.Value.PageNumber,
+          PageSize = result.Value.PageSize,
+          TotalPages = result.Value.TotalPages,
+          TotalCount = result.Value.TotalCount
+        };
+      }
+      else
+      {
+        ThrowError(result.Errors.FirstOrDefault() ?? "Failed to retrieve comments");
+      }
     }
-    else
+    catch (Exception ex)
     {
-      ThrowError(result.Errors.FirstOrDefault() ?? "Failed to retrieve comments");
+      ThrowError(ex.Message);
     }
   }
 }
-// using Anonymous_Survey_Ardalis.UseCases.Comments.Queries.List;
-// using FastEndpoints;
-// using MediatR;
-//
-// namespace Anonymous_Survey_Ardalis.Web.Comments;
-//
-// public class List(IMediator _mediator) : EndpointWithoutRequest<CommentListResponse>
-// {
-//   public override void Configure()
-//   {
-//     Get("/Comments");
-//     AllowAnonymous();
-//   }
-//
-//   public override async Task HandleAsync(CancellationToken cancellationToken)
-//   {
-//     var result =
-//       await _mediator.Send(new ListCommentsQuery(), cancellationToken);
-//
-//     if (result.IsSuccess)
-//     {
-//       Response = new CommentListResponse
-//       {
-//         Comments = result.Value.Select(c => new CommentRecord(c.CommentId, c.CommentText, c.SubjectId)).ToList()
-//       };
-//     }
-//   }
-// }

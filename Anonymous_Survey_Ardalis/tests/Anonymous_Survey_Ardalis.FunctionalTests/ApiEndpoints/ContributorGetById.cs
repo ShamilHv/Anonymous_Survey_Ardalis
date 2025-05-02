@@ -1,5 +1,4 @@
-﻿using Anonymous_Survey_Ardalis.Infrastructure.Data;
-using Anonymous_Survey_Ardalis.Web.Contributors;
+﻿using Anonymous_Survey_Ardalis.Web.Contributors;
 using Ardalis.HttpClientTestExtensions;
 using Xunit;
 

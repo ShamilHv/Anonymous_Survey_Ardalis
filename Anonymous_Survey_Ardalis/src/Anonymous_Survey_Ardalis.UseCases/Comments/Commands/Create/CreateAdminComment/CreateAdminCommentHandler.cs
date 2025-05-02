@@ -1,16 +1,14 @@
 using System.Security.Claims;
 using Anonymous_Survey_Ardalis.Core.CommentAggregate;
 using Anonymous_Survey_Ardalis.Core.CommentAggregate.Specifications;
-using Anonymous_Survey_Ardalis.Core.Interfaces;
 using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Anonymous_Survey_Ardalis.UseCases.Comments.Commands.Create.CreateAdminComment;
 
 public class CreateAdminCommentHandler(
-  IRepository<Comment> _repository, 
+  IRepository<Comment> _repository,
   IHttpContextAccessor httpContextAccessor) // Add permission service
   : ICommandHandler<CreateAdminCommentCommand, Result<Comment>>
 {
@@ -25,7 +23,7 @@ public class CreateAdminCommentHandler(
 
     // Get the current admin ID
     var adminId = GetCurrentAdminId();
-    
+
     var adminComment = new Comment(comment.SubjectId, request.CommentText)
     {
       IsAdminComment = true,

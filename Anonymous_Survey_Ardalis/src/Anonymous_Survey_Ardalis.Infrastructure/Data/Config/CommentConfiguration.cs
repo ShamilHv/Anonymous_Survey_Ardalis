@@ -14,7 +14,7 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
 
     builder.Property(c => c.SubjectId)
       .IsRequired();
-    
+
     builder.Property(c => c.CommentText)
       .HasColumnType("text")
       .IsRequired();
@@ -39,9 +39,9 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
 
     // Fix this relationship - make it match the relationship in AdminConfiguration
     builder.HasOne(c => c.Admin)
-      .WithMany(a => a.Comments)  // Specify the property name in Admin class
+      .WithMany(a => a.Comments) // Specify the property name in Admin class
       .HasForeignKey(c => c.AdminId)
-      .IsRequired(false);  // Match the IsRequired setting
+      .IsRequired(false); // Match the IsRequired setting
   }
   // public void Configure(EntityTypeBuilder<Comment> builder)
   // {

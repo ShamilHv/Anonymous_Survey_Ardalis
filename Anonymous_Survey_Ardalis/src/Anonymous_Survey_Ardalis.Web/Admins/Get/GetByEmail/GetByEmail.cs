@@ -1,4 +1,3 @@
-using Anonymous_Survey_Ardalis.Core.AdminAggregate;
 using Anonymous_Survey_Ardalis.UseCases.Admins.Queries.Get;
 using Ardalis.Result;
 using FastEndpoints;
@@ -10,7 +9,7 @@ public class GetByEmail(IMediator mediator) : Endpoint<GetAdminByEmailRequest, A
 {
   public override void Configure()
   {
-    Get(GetAdminByEmailRequest.Route); 
+    Get(GetAdminByEmailRequest.Route);
   }
 
   public override async Task HandleAsync(GetAdminByEmailRequest request,
@@ -33,6 +32,3 @@ public class GetByEmail(IMediator mediator) : Endpoint<GetAdminByEmailRequest, A
     }
   }
 }
-
-
-

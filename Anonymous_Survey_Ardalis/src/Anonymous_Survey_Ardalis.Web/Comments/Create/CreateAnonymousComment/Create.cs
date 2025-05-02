@@ -1,11 +1,7 @@
 using Anonymous_Survey_Ardalis.Core.Exceptions;
-using Anonymous_Survey_Ardalis.Core.Interfaces;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Commands.Create;
-using Anonymous_Survey_Ardalis.Web.Security;
-using Ardalis.Result;
 using FastEndpoints;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Anonymous_Survey_Ardalis.Web.Comments.Create.CreateAnonymousComment;
 
@@ -34,20 +30,18 @@ public class Create(IMediator _mediator)
 
       if (result.IsSuccess)
       {
-        Response = new CreateCommentResponse("https://localhost:57679/Comments/"+result.Value);
+        Response = new CreateCommentResponse("https://localhost:57679/Comments/" + result.Value);
       }
     }
     catch (ResourceNotFoundException ex)
     {
       ThrowError(ex.Message);
-      await SendErrorsAsync(statusCode: 404, cancellation: cancellationToken);
-      return;
+      await SendErrorsAsync(404, cancellationToken);
     }
     catch (Exception ex)
     {
       ThrowError(ex.Message);
-      await SendErrorsAsync(statusCode: 500, cancellation: cancellationToken);
-      return;
+      await SendErrorsAsync(500, cancellationToken);
     }
   }
 }

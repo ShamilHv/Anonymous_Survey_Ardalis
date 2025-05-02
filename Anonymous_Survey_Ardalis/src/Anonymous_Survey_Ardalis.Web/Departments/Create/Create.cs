@@ -1,13 +1,16 @@
 using Anonymous_Survey_Ardalis.Core.Interfaces;
+using Anonymous_Survey_Ardalis.UseCases.CurrentUserServices;
 using Anonymous_Survey_Ardalis.UseCases.Departments.Commands.Create;
-using Anonymous_Survey_Ardalis.Web.Security;
 using FastEndpoints;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Anonymous_Survey_Ardalis.Web.Departments;
 
-public class Create(IMediator _mediator, IAdminPermissionService _adminPermissionService, ICurrentUserService _currentUserService)
+public class Create(
+  IMediator _mediator,
+  IAdminPermissionService _adminPermissionService,
+  ICurrentUserService _currentUserService)
   : Endpoint<CreateDepartmentRequest, CreateDepartmentResponse>
 {
   public override void Configure()

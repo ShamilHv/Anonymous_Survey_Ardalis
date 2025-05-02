@@ -2,8 +2,6 @@ using Anonymous_Survey_Ardalis.Core.CommentAggregate;
 using Anonymous_Survey_Ardalis.Core.Exceptions;
 using Anonymous_Survey_Ardalis.Core.SubjectAggregate;
 using Anonymous_Survey_Ardalis.Core.SubjectAggregate.Specifications;
-using Anonymous_Survey_Ardalis.UseCases.Subjects.Queries;
-using Anonymous_Survey_Ardalis.UseCases.Subjects.Queries.Get.GetWithComments;
 using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Microsoft.AspNetCore.Http;
@@ -11,17 +9,21 @@ using File = Anonymous_Survey_Ardalis.Core.CommentAggregate.File;
 
 namespace Anonymous_Survey_Ardalis.UseCases.Comments.Commands.Create;
 
-public class CreateCommentHandler(IRepository<Comment> _repository, IRepository<Subject> subjectRepository, IRepository<File> _fileRepository)
+public class CreateCommentHandler(
+  IRepository<Comment> _repository,
+  IRepository<Subject> subjectRepository,
+  IRepository<File> _fileRepository)
   : ICommandHandler<CreateCommentCommand, Result<Guid>>
 {
   public async Task<Result<Guid>> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
   {
-    
     var spec = new SubjectByIdSpec(request.SubjectId);
     var subject = await subjectRepository.FirstOrDefaultAsync(spec, cancellationToken);
     if (subject == null)
     {
-      throw new ResourceNotFoundException($"Subject with id {request.SubjectId}");    }
+      throw new ResourceNotFoundException($"Subject with id {request.SubjectId}");
+    }
+
     var newComment = new Comment(request.SubjectId, request.CommentText);
 
     if (request.File != null)

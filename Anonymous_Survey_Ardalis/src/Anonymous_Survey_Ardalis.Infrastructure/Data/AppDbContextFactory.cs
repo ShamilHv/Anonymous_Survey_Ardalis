@@ -1,4 +1,3 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -10,8 +9,8 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
   public AppDbContext CreateDbContext(string[] args)
   {
     var configBuilder = new ConfigurationBuilder()
-      .AddJsonFile("appsettings.json", optional: false)
-      .AddJsonFile("appsettings.Development.json", optional: true)
+      .AddJsonFile("appsettings.json", false)
+      .AddJsonFile("appsettings.Development.json", true)
       .AddEnvironmentVariables();
 
     var config = configBuilder.Build();
@@ -29,6 +28,3 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     return new AppDbContext(optionsBuilder.Options, null);
   }
 }
-
-
-

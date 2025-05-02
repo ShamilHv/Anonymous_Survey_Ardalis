@@ -11,7 +11,6 @@ public class Department(string departmentName) : EntityBase, IAggregateRoot
   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
   public virtual ICollection<Subject> Subjects { get; set; } = new List<Subject>();
-  
-  public virtual ICollection<Admin> Admins { get; set; } = new List<Admin>();
 
+  public virtual ICollection<Admin> Admins { get; set; } = new List<Admin>();
 }

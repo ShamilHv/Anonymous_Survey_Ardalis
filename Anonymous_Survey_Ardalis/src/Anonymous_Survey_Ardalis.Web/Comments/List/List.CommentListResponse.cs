@@ -10,9 +10,11 @@ public class CommentListResponse
   public bool HasPreviousPage => PageNumber > 1;
   public bool HasNextPage => PageNumber < TotalPages;
 }
+
 public record CommentListRequest
 {
   public int? SubjectId { get; init; }
+  public int? DepartmentId { get; init; }
   public int PageNumber { get; init; } = 1;
   public int PageSize { get; init; } = 10;
 }

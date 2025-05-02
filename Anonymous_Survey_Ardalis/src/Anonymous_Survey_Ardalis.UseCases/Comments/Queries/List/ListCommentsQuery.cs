@@ -8,5 +8,6 @@ public record ListCommentsQuery : IQuery<Result<PagedResponse<CommentDto>>>
 {
   public int PageNumber { get; init; } = 1;
   public int PageSize { get; init; } = 10;
-  public int? SubjectId { get; init; } 
+  public int? SubjectId { get; init; }
+  public int? DepartmentId { get; init; }
 }

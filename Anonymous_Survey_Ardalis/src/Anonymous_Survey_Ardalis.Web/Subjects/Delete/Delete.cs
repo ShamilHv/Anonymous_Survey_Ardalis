@@ -1,13 +1,16 @@
 using Anonymous_Survey_Ardalis.Core.Interfaces;
+using Anonymous_Survey_Ardalis.UseCases.CurrentUserServices;
 using Anonymous_Survey_Ardalis.UseCases.Subjects.Commands.Delete;
-using Anonymous_Survey_Ardalis.Web.Security;
 using Ardalis.Result;
 using FastEndpoints;
 using MediatR;
 
 namespace Anonymous_Survey_Ardalis.Web.Subjects;
 
-public class Delete(IMediator _mediator, IAdminPermissionService _adminPermissionService, ICurrentUserService _currentUserService)
+public class Delete(
+  IMediator _mediator,
+  IAdminPermissionService _adminPermissionService,
+  ICurrentUserService _currentUserService)
   : Endpoint<DeleteSubjectRequest>
 {
   public override void Configure()

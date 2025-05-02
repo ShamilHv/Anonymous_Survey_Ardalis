@@ -7,4 +7,5 @@ public interface IAdminPermissionService
   Task<bool> CanCreateSubject(int adminId, int departmentId);
   Task<bool> CanDeleteSubject(int adminId, int subjectId);
   Task<bool> CanModifyDepartment(int adminId);
+  Task<bool> CanGetComments(int adminId, int? departmentId, int? subjectId);
 }

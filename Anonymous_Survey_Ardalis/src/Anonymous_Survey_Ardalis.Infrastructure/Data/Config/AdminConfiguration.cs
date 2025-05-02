@@ -37,7 +37,7 @@ public class AdminConfiguration : IEntityTypeConfiguration<Admin>
       .HasForeignKey(a => a.SubjectId)
       .IsRequired(false)
       .OnDelete(DeleteBehavior.NoAction);
-    
+
     // IMPORTANT: Define the Department relationship EXPLICITLY
     builder.HasOne(a => a.Department)
       .WithMany() // If Department has a collection of Admins, specify it here

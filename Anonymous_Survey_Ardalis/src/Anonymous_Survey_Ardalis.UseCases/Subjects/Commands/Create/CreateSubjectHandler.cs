@@ -17,6 +17,7 @@ public class CreateCommentHandler(IRepository<Subject> _repository, IRepository<
     {
       return Result.NotFound();
     }
+
     var newSubject = new Subject(request.subjectName, request.departmentId);
 
     await _repository.AddAsync(newSubject, cancellationToken);

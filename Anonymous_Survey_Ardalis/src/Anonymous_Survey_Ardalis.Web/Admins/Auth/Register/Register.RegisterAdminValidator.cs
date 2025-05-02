@@ -11,7 +11,7 @@ public class RegisterAdminValidator : Validator<AuthRequest>
     RuleFor(x => x.Email)
       .NotEmpty()
       .EmailAddress()
-      .WithMessage("Invalid email address");  
+      .WithMessage("Invalid email address");
 
     RuleFor(x => x.AdminName)
       .NotEmpty()

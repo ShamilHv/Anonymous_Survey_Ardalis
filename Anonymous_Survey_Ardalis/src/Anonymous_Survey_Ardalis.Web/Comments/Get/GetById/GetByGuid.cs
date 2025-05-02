@@ -1,4 +1,3 @@
-using Anonymous_Survey_Ardalis.UseCases.Comments.Queries.Get;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Queries.Get.GetByGuid;
 using Ardalis.Result;
 using FastEndpoints;
@@ -34,7 +33,7 @@ public class GetByGuid(IMediator _mediator)
       await SendOkAsync(response, cancellationToken);
       return;
     }
-    
+
     await SendErrorsAsync(1);
   }
 }

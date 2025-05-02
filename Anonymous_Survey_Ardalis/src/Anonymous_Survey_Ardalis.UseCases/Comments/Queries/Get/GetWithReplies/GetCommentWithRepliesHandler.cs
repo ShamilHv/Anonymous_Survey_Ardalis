@@ -13,18 +13,18 @@ public class GetCommentWithRepliesHandler(IReadRepository<Comment> repository)
     CancellationToken cancellationToken)
   {
     var specForComment = new CommentByGuidSpec(request.CommentIdentifier);
-    var comment= await repository.FirstOrDefaultAsync(specForComment, cancellationToken);
+    var comment = await repository.FirstOrDefaultAsync(specForComment, cancellationToken);
     var spec = new CommentWithRepliesSpec(request.CommentIdentifier);
     var replies = await repository.ListAsync(spec, cancellationToken);
 
-    if (replies == null || comment==null || !replies.Any())
+    if (replies == null || comment == null || !replies.Any())
     {
       return Result.NotFound();
     }
 
     var commentDtos = replies.Select(MapToCommentDto).ToList();
 
-    return new CommentWithRepliesDto(comment.Id, comment.SubjectId, comment.CommentText, 
+    return new CommentWithRepliesDto(comment.Id, comment.SubjectId, comment.CommentText,
       comment.CreatedAt, comment.ParentCommentId, comment.FileId, comment.IsAdminComment, commentDtos);
   }
 
@@ -33,4 +33,4 @@ public class GetCommentWithRepliesHandler(IReadRepository<Comment> repository)
     return new CommentDto(comment.Id, comment.SubjectId, comment.CommentText, comment.CreatedAt,
       comment.ParentCommentId, comment.FileId, comment.IsAdminComment);
   }
-} 
+}

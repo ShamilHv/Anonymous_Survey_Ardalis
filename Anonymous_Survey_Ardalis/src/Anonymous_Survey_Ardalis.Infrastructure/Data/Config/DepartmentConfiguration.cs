@@ -1,4 +1,3 @@
-using Anonymous_Survey_Ardalis.Core.AdminAggregate;
 using Anonymous_Survey_Ardalis.Core.DepartmentAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -25,10 +24,10 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
       .WithOne(s => s.Department)
       .HasForeignKey(s => s.DepartmentId)
       .OnDelete(DeleteBehavior.NoAction);
-      
+
     // IMPORTANT: Add this only if you have a collection of Admins in Department class
     // If you don't have this collection, REMOVE this configuration
-    builder.HasMany(d => d.Admins) 
+    builder.HasMany(d => d.Admins)
       .WithOne(a => a.Department)
       .HasForeignKey(a => a.DepartmentId)
       .IsRequired(false)

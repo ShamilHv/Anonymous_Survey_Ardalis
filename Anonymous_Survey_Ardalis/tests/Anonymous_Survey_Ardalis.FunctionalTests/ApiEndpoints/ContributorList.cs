@@ -1,5 +1,4 @@
-﻿using Anonymous_Survey_Ardalis.Infrastructure.Data;
-using Anonymous_Survey_Ardalis.Web.Contributors;
+﻿using Anonymous_Survey_Ardalis.Web.Contributors;
 using Ardalis.HttpClientTestExtensions;
 using Xunit;
 
@@ -16,8 +15,8 @@ public class ContributorList(CustomWebApplicationFactory<Program> factory)
   {
     var result = await _client.GetAndDeserializeAsync<ContributorListResponse>("/Contributors");
 
-  //   Assert.Equal(2, result.Contributors.Count);
-  //   Assert.Contains(result.Contributors, i => i.Name == SeedData.Contributor1.Name);
-  //   Assert.Contains(result.Contributors, i => i.Name == SeedData.Contributor2.Name);
-   }
+    //   Assert.Equal(2, result.Contributors.Count);
+    //   Assert.Contains(result.Contributors, i => i.Name == SeedData.Contributor1.Name);
+    //   Assert.Contains(result.Contributors, i => i.Name == SeedData.Contributor2.Name);
+  }
 }

@@ -5,7 +5,8 @@ using Ardalis.SharedKernel;
 
 namespace Anonymous_Survey_Ardalis.UseCases.Comments.Queries.Get.GetByGuid;
 
-public class GetCommentByGuidHandler(IReadRepository<Comment> repository) : IQueryHandler<GetCommentByGuidQuery, Result<CommentDto>>
+public class GetCommentByGuidHandler(IReadRepository<Comment> repository)
+  : IQueryHandler<GetCommentByGuidQuery, Result<CommentDto>>
 {
   public async Task<Result<CommentDto>> Handle(GetCommentByGuidQuery request, CancellationToken cancellationToken)
   {

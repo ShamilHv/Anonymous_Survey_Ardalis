@@ -1,6 +1,7 @@
 namespace Anonymous_Survey_Ardalis.UseCases.Comments;
 
-public record CommentWithRepliesDto(int CommentId,
+public record CommentWithRepliesDto(
+  int CommentId,
   int SubjectId,
   string CommentText,
   DateTime CreatedAt,
@@ -8,4 +9,4 @@ public record CommentWithRepliesDto(int CommentId,
   int? FileId,
   bool IsAdminComment,
   List<CommentDto> Replies
-  );
+);
