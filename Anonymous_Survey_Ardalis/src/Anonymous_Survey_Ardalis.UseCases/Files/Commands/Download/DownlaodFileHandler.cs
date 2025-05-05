@@ -51,8 +51,5 @@ public class DownloadFileHandler(
     };
   }
 
-  public Task<Result<FileDownloadDto>> ExecuteAsync(DownloadFileCommand command, CancellationToken ct)
-  {
-    throw new NotImplementedException();
-  }
+
 }

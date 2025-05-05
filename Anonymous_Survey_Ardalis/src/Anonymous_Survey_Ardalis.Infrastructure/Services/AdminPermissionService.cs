@@ -257,4 +257,42 @@ public class AdminPermissionService : IAdminPermissionService
 
     return false;
   }
+  
+  public async Task<bool> CanRequestSubjectChange(int adminId, int commentId)
+  {
+    var adminSpec = new AdminByIdSpec(adminId);
+    var admin = await _adminRepository.FirstOrDefaultAsync(adminSpec);
+    if (admin == null)
+    {
+      throw new Exception("Can't find admin");
+    }
+
+    var commentSpec = new CommentByIdSpec(commentId);
+    var comment = await _commentRepository.FirstOrDefaultAsync(commentSpec);
+    if (comment == null)
+    {
+      throw new Exception("Can't find comment");
+    }
+
+    // SuperAdmin can request changes for any comment
+    if (admin.Role == AdminRole.SuperAdmin)
+    {
+      return true;
+    }
+
+    // SubjectAdmin can only request changes for comments in their subject
+    if (admin.Role == AdminRole.SubjectAdmin)
+    {
+      return admin.SubjectId == comment.SubjectId;
+    }
+
+    // DepartmentAdmin can request changes for comments in any subject in their department
+    if (admin.Role == AdminRole.DepartmentAdmin)
+    {
+      var subject = await _subjectRepository.GetByIdAsync(comment.SubjectId);
+      return subject?.DepartmentId == admin.DepartmentId;
+    }
+
+    return false;
+  }
 }

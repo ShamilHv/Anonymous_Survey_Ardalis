@@ -1,16 +1,33 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using Anonymous_Survey_Ardalis.Core.AdminAggregate;
+using Anonymous_Survey_Ardalis.Core.AdminAggregate.Specifications;
+using Anonymous_Survey_Ardalis.Core.CommentAggregate;
 using Anonymous_Survey_Ardalis.Core.Interfaces;
+using Anonymous_Survey_Ardalis.Core.SubjectAggregate;
+using Ardalis.SharedKernel;
 using Microsoft.Extensions.Logging;
 
 namespace Anonymous_Survey_Ardalis.Infrastructure.Email;
 
 public class EmailSender: IEmailSender
     {
+        private readonly IRepository<Admin> _adminRepository;
+        private readonly IRepository<Subject> _subjectRepository;
         private readonly ILogger<EmailSender> _logger;
         private readonly MailserverConfiguration _config;
 
+        public EmailSender(
+          ILogger<EmailSender> logger, 
+          MailserverConfiguration config,
+          IRepository<Admin> adminRepository,
+          IRepository<Subject> subjectRepository)
+        {
+          _logger = logger;
+          _config = config;
+          _adminRepository = adminRepository;
+          _subjectRepository = subjectRepository;
+        }
         /// <summary>
         /// Sends a welcome email with password to a newly created admin
         /// </summary>
@@ -37,11 +54,6 @@ public class EmailSender: IEmailSender
           await SendEmailAsync(admin.Email, subject, body);
         }
 
-        public EmailSender(ILogger<EmailSender> logger, MailserverConfiguration config)
-        {
-            _logger = logger;
-            _config = config;
-        }
 
         /// <summary>
         /// Sends an email to the specified recipient
@@ -75,5 +87,73 @@ public class EmailSender: IEmailSender
                 throw;
             }
         }
+        
+        
+         public async Task SendSubjectChangeRequestEmailAsync(Admin requestingAdmin, Comment comment, int? suggestedSubjectId, string? message)
+    {
+        try
+        {
+            // Get suggested subject name
+            var currentSubject = await _subjectRepository.GetByIdAsync(comment.SubjectId);
+            
+            var suggestedSubject = await _subjectRepository.GetByIdAsync(suggestedSubjectId ?? 0);
+            
+            if (currentSubject == null || suggestedSubject == null)
+            {
+                _logger.LogError("Failed to send subject change request email: Subject not found");
+                throw new Exception("Subject not found");
+            }
+
+            // Get all super admins
+            var superAdmins = await _adminRepository.ListAsync(new AdminBySuperAdminRoleSpec());
+            
+            if (!superAdmins.Any())
+            {
+                _logger.LogWarning("No super admins found to send subject change request email");
+                throw new Exception("No super admins found");
+            }
+
+            string subject = $"Subject Change Request for Comment #{comment.Id}";
+            
+            string body = $@"
+            <html>
+            <body>
+                <h2>Subject Change Request</h2>
+                <p>A request has been made to change the subject of a comment.</p>
+                
+                <h3>Request Details:</h3>
+                <ul>
+                    <li><strong>Requesting Admin:</strong> {requestingAdmin.AdminName} ({requestingAdmin.Email})</li>
+                    <li><strong>Admin Role:</strong> {requestingAdmin.Role}</li>
+                    <li><strong>Comment ID:</strong> {comment.Id}</li>
+                    <li><strong>Comment Text:</strong> {comment.CommentText}</li>
+                    <li><strong>Current Subject:</strong> {currentSubject.SubjectName} (ID: {currentSubject.Id})</li>
+                    <li><strong>Suggested Subject:</strong> {suggestedSubject.SubjectName} (ID: {suggestedSubject.Id})</li>
+                </ul>
+                
+                {(string.IsNullOrEmpty(message) ? "" : $@"
+                <h3>Additional Message:</h3>
+                <p>{message}</p>")}
+                
+                <p>To approve this change, please update the comment's subject in the admin dashboard.</p>
+                
+                <p>Thank you,<br>Anonymous Survey System</p>
+            </body>
+            </html>";
+
+            // Send to all super admins
+            foreach (var superAdmin in superAdmins)
+            {
+                await SendEmailAsync(superAdmin.Email, subject, body);
+            }
+
+            _logger.LogInformation($"Subject change request email sent to {superAdmins.Count} super admins");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send subject change request email");
+            throw;
+        }
     }
+}
 
