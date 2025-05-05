@@ -7,8 +7,10 @@ using Anonymous_Survey_Ardalis.UseCases.Admins.Queries.List;
 using Anonymous_Survey_Ardalis.UseCases.Comments.Queries.List;
 using Anonymous_Survey_Ardalis.UseCases.Contributors.List;
 using Anonymous_Survey_Ardalis.UseCases.Departments.Queries.List;
+using Anonymous_Survey_Ardalis.UseCases.Files.Commands.Download;
 using Anonymous_Survey_Ardalis.UseCases.Subjects.Queries.List;
 using Ardalis.GuardClauses;
+using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -38,6 +40,7 @@ public static class InfrastructureServiceExtensions
       .AddScoped<IListSubjectQueryService, ListSubjectsQueryService>()
       .AddScoped<IListDepartmentQueryService, ListDepartmentsQueryService>()
       .AddScoped<IListAdminsQueryService, ListAdminsQueryService>();
+
 
 
     

@@ -9,7 +9,7 @@ public class CreateDepartmentAdminHandler(IRepository<Admin> _repository)
 {
   public async Task<Result<Admin>> Handle(CreateDepartmentAdminCommand request, CancellationToken cancellationToken)
   {
-    var newAdmin = Admin.CreateSubjectAdmin(request.AdminName, request.Email, request.DepartmentId);
+    var newAdmin = Admin.CreateDepartmentAdmin(request.AdminName, request.Email, request.DepartmentId);
 
     await _repository.AddAsync(newAdmin, cancellationToken);
     await _repository.SaveChangesAsync(cancellationToken);

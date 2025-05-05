@@ -75,18 +75,11 @@ public class AuthService : IAuthService
       throw new Exception("Current admin does not have permission to create new admins");
     }
 
-    // Sanitize inputs - treat 0 as null
     var sanitizedSubjectId = request.SubjectId > 0 ? request.SubjectId : null;
     var sanitizedDepartmentId = request.DepartmentId > 0 ? request.DepartmentId : null;
 
-    // Determine admin type based on sanitized IDs
     Admin newAdmin;
-
-    // First, handle the case where we have a specific priority:
-    // 1. If DepartmentId is valid and non-zero, create Department Admin
-    // 2. If only SubjectId is valid and non-zero, create Subject Admin
-    // 3. If both are null or zero, create Super Admin
-
+    
     if (sanitizedDepartmentId.HasValue)
     {
       // Verify department exists
