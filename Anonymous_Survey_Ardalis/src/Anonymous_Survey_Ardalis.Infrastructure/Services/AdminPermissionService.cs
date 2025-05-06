@@ -295,4 +295,17 @@ public class AdminPermissionService : IAdminPermissionService
 
     return false;
   }
+  
+  public async Task<bool> CanUpdateCommentSubject(int adminId)
+  {
+    var adminSpec = new AdminByIdSpec(adminId);
+    var admin = await _adminRepository.FirstOrDefaultAsync(adminSpec);
+    if (admin == null)
+    {
+      return false;
+    }
+
+    // Only SuperAdmin can update a comment's subject
+    return admin.Role == AdminRole.SuperAdmin;
+  }
 }
