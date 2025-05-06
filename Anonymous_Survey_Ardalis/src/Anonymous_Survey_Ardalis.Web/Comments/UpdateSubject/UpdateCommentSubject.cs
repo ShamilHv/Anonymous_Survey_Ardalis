@@ -11,8 +11,8 @@ namespace Anonymous_Survey_Ardalis.Web.Comments.UpdateSubject;
 [Authorize]
 public class UpdateCommentSubject : Endpoint<UpdateCommentSubjectRequest, UpdateCommentSubjectResponse>
 {
-  private readonly IMediator _mediator;
   private readonly ICurrentUserService _currentUserService;
+  private readonly IMediator _mediator;
 
   public UpdateCommentSubject(IMediator mediator, ICurrentUserService currentUserService)
   {
@@ -42,7 +42,7 @@ public class UpdateCommentSubject : Endpoint<UpdateCommentSubjectRequest, Update
     {
       var adminId = _currentUserService.GetCurrentAdminId();
       var result = await _mediator.Send(
-        new UpdateCommentSubjectCommand(request.CommentId, request.NewSubjectId, adminId), 
+        new UpdateCommentSubjectCommand(request.CommentId, request.NewSubjectId, adminId),
         cancellationToken);
 
       if (result.Status == ResultStatus.Forbidden)

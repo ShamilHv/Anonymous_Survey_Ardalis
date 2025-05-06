@@ -38,15 +38,15 @@ public class DownloadFile(IMediator _mediator) : Endpoint<DownloadFileRequest, I
 
       if (result.IsSuccess && result.Value != null)
       {
-        var fileBytes = await System.IO.File.ReadAllBytesAsync(result.Value.FilePath, cancellationToken);
+        var fileBytes = await File.ReadAllBytesAsync(result.Value.FilePath, cancellationToken);
         var contentType = GetContentType(result.Value.FilePath);
-        
+
         // Return the physical file with proper Content-Type and download filename
         await SendBytesAsync(
-            bytes: fileBytes,
-            contentType: contentType,
-            fileName: result.Value.FileName,
-            cancellation: cancellationToken
+          fileBytes,
+          contentType: contentType,
+          fileName: result.Value.FileName,
+          cancellation: cancellationToken
         );
       }
       else

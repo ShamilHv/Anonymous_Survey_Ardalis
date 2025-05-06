@@ -2,7 +2,7 @@
 
 namespace Anonymous_Survey_Ardalis.Core.AdminAggregate.Specifications;
 
-public class AdminBySuperAdminRoleSpec: Specification<Admin>
+public class AdminBySuperAdminRoleSpec : Specification<Admin>
 {
   public AdminBySuperAdminRoleSpec()
   {

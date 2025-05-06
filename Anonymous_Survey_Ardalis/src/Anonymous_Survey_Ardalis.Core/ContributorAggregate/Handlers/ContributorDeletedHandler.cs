@@ -22,3 +22,5 @@
 //       $"Contributor with id {domainEvent.ContributorId} was deleted.");
 //   }
 // }
+
+

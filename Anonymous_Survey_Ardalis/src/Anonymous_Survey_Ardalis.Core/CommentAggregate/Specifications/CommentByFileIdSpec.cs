@@ -2,7 +2,7 @@
 
 namespace Anonymous_Survey_Ardalis.Core.CommentAggregate.Specifications;
 
-public class CommentByFileIdSpec: Specification<Comment>
+public class CommentByFileIdSpec : Specification<Comment>
 {
   public CommentByFileIdSpec(int fileId)
   {

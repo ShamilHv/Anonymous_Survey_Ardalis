@@ -156,7 +156,7 @@ public class AdminPermissionService : IAdminPermissionService
     // Get the comment that contains this file
     var comments = await _commentRepository.ListAsync(
       new CommentByFileIdSpec(fileId));
-  
+
     var comment = comments.FirstOrDefault();
     if (comment == null)
     {
@@ -178,6 +178,7 @@ public class AdminPermissionService : IAdminPermissionService
 
     return false;
   }
+
   public async Task<bool> CanCreateAdmin(int adminId)
   {
     var adminSpec = new AdminByIdSpec(adminId);
@@ -257,7 +258,7 @@ public class AdminPermissionService : IAdminPermissionService
 
     return false;
   }
-  
+
   public async Task<bool> CanRequestSubjectChange(int adminId, int commentId)
   {
     var adminSpec = new AdminByIdSpec(adminId);
@@ -295,7 +296,7 @@ public class AdminPermissionService : IAdminPermissionService
 
     return false;
   }
-  
+
   public async Task<bool> CanUpdateCommentSubject(int adminId)
   {
     var adminSpec = new AdminByIdSpec(adminId);
@@ -308,4 +309,43 @@ public class AdminPermissionService : IAdminPermissionService
     // Only SuperAdmin can update a comment's subject
     return admin.Role == AdminRole.SuperAdmin;
   }
+  
+  public async Task<bool> CanReportInappropriateComment(int adminId, int commentId)
+  {
+    var adminSpec = new AdminByIdSpec(adminId);
+    var admin = await _adminRepository.FirstOrDefaultAsync(adminSpec);
+    if (admin == null)
+    {
+      throw new Exception("Can't find admin");
+    }
+
+    var commentSpec = new CommentByIdSpec(commentId);
+    var comment = await _commentRepository.FirstOrDefaultAsync(commentSpec);
+    if (comment == null)
+    {
+      throw new Exception("Can't find comment");
+    }
+
+    // SuperAdmin can report any comment
+    if (admin.Role == AdminRole.SuperAdmin)
+    {
+      return true;
+    }
+
+    // SubjectAdmin can only report comments in their subject
+    if (admin.Role == AdminRole.SubjectAdmin)
+    {
+      return admin.SubjectId == comment.SubjectId;
+    }
+
+    // DepartmentAdmin can report comments in any subject in their department
+    if (admin.Role == AdminRole.DepartmentAdmin)
+    {
+      var subject = await _subjectRepository.GetByIdAsync(comment.SubjectId);
+      return subject?.DepartmentId == admin.DepartmentId;
+    }
+
+    return false;
+  }
+
 }

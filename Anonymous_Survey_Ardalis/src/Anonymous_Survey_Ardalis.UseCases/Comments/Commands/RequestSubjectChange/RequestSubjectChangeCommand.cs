@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Anonymous_Survey_Ardalis.UseCases.Comments.Commands.RequestSubjectChange;
 
-public class RequestSubjectChangeCommand: IRequest<Result<bool>>
+public class RequestSubjectChangeCommand : IRequest<Result<bool>>
 {
   public int CommentId { get; set; }
   public int? SuggestedSubjectId { get; set; }

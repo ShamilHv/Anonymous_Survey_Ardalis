@@ -39,7 +39,7 @@ public class List : Endpoint<CommentListRequest, CommentListResponse>
     {
       var adminId = _currentUserService.GetCurrentAdminId();
       var adminRole = _currentUserService.GetCurrentAdminRole();
-      
+
       // Super admin specific validations
       if (adminRole == AdminRole.SuperAdmin && request.SubjectId.HasValue && request.DepartmentId.HasValue)
       {

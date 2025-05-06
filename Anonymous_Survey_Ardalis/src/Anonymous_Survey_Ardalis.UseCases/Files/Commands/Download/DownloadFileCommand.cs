@@ -3,7 +3,7 @@ using Ardalis.SharedKernel;
 
 namespace Anonymous_Survey_Ardalis.UseCases.Files.Commands.Download;
 
-public record DownloadFileCommand(int FileId) :  ICommand<Result<FileDownloadDto>>;
+public record DownloadFileCommand(int FileId) : ICommand<Result<FileDownloadDto>>;
 
 public class FileDownloadDto
 {

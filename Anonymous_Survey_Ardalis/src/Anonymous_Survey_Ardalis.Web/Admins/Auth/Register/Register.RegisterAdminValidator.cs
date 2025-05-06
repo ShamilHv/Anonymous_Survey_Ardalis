@@ -16,6 +16,5 @@ public class RegisterAdminValidator : Validator<AuthRequest>
     RuleFor(x => x.AdminName)
       .NotEmpty()
       .WithMessage("Name is required");
-
-     }
+  }
 }

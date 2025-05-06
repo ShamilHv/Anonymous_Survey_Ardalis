@@ -20,8 +20,8 @@ public class Register(
     {
       s.ExampleRequest = new AuthRequest
       {
-        AdminName = "Admin", 
-        Email = "admin@example.com", 
+        AdminName = "Admin",
+        Email = "admin@example.com",
         // Password is now optional
         SubjectId = 1
       };
@@ -54,7 +54,7 @@ public class Register(
           RefreshToken = admin.RefreshToken
         },
         // Add a message if password was generated
-        Message = "Admin created successfully. A temporary password has been sent to their email." 
+        Message = "Admin created successfully. A temporary password has been sent to their email."
       };
     }
   }

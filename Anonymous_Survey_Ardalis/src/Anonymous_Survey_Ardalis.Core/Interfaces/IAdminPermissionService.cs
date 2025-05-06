@@ -10,6 +10,7 @@ public interface IAdminPermissionService
   Task<bool> CanGetComments(int adminId, int? departmentId, int? subjectId);
   Task<bool> CanDownloadFile(int adminId, int fileId);
   Task<bool> CanRequestSubjectChange(int adminId, int commentId);
-  public Task<bool> CanUpdateCommentSubject(int adminId);
+  Task<bool> CanUpdateCommentSubject(int adminId);
+  Task<bool> CanReportInappropriateComment(int adminId, int commentId);
 
 }

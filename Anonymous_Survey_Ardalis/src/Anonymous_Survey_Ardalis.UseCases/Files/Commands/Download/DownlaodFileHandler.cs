@@ -9,14 +9,15 @@ using File = Anonymous_Survey_Ardalis.Core.CommentAggregate.File;
 namespace Anonymous_Survey_Ardalis.UseCases.Files.Commands.Download;
 
 public class DownloadFileHandler(
-  IRepository<File> fileRepository, 
+  IRepository<File> fileRepository,
   ICurrentUserService currentUserService,
   IAdminPermissionService adminPermissionService)
   : ICommandHandler<DownloadFileCommand, Result<FileDownloadDto>>
-{  public async Task<Result<FileDownloadDto>> Handle(DownloadFileCommand request, CancellationToken cancellationToken)
+{
+  public async Task<Result<FileDownloadDto>> Handle(DownloadFileCommand request, CancellationToken cancellationToken)
   {
     var adminId = currentUserService.GetCurrentAdminId();
-    
+
     // Check if admin has permission to download this file
     var hasPermission = await adminPermissionService.CanDownloadFile(adminId, request.FileId);
     if (!hasPermission)
@@ -35,7 +36,7 @@ public class DownloadFileHandler(
     var desktopPath = "/home/shamil/Desktop";
     var relativePath = file.FilePath.TrimStart('/');
     var fullPath = Path.Combine(desktopPath, relativePath);
-    
+
     if (!System.IO.File.Exists(fullPath))
     {
       throw new ResourceNotFoundException($"Physical file not found at {fullPath}");
@@ -44,12 +45,6 @@ public class DownloadFileHandler(
     // Get the original file name from the path
     var fileName = Path.GetFileName(fullPath);
 
-    return new FileDownloadDto
-    {
-      FilePath = fullPath,
-      FileName = fileName
-    };
+    return new FileDownloadDto { FilePath = fullPath, FileName = fileName };
   }
-
-
 }

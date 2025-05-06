@@ -47,7 +47,7 @@ public class ListCommentsHandler : IQueryHandler<ListCommentsQuery, Result<Paged
       {
         case AdminRole.SuperAdmin:
           effectiveSubjectId = request.SubjectId;
-          
+
           // If department filter is provided, get all subjects in that department
           if (request.DepartmentId.HasValue && !request.SubjectId.HasValue)
           {
@@ -55,6 +55,7 @@ public class ListCommentsHandler : IQueryHandler<ListCommentsQuery, Result<Paged
             var departmentSubjects = await _subjectRepository.ListAsync(subjectSpec, cancellationToken);
             subjectIds = departmentSubjects.Select(s => s.Id).ToList();
           }
+
           break;
 
         case AdminRole.SubjectAdmin:
@@ -63,7 +64,7 @@ public class ListCommentsHandler : IQueryHandler<ListCommentsQuery, Result<Paged
           {
             return Result.Error("Subject admin doesn't have an assigned subject");
           }
-          
+
           effectiveSubjectId = adminSubjectId.Value;
           break;
 
@@ -80,12 +81,12 @@ public class ListCommentsHandler : IQueryHandler<ListCommentsQuery, Result<Paged
             {
               return Result.Error("Subject not found");
             }
-            
+
             if (subject.DepartmentId != adminDepartmentId.Value)
             {
               return Result.Error("Subject does not belong to this admin's department");
             }
-            
+
             effectiveSubjectId = request.SubjectId.Value;
           }
           else
@@ -93,7 +94,7 @@ public class ListCommentsHandler : IQueryHandler<ListCommentsQuery, Result<Paged
             var subjectSpec = new SubjectsByDepartmentSpec(adminDepartmentId.Value);
             var departmentSubjects = await _subjectRepository.ListAsync(subjectSpec, cancellationToken);
             subjectIds = departmentSubjects.Select(s => s.Id).ToList();
-            
+
             if (!subjectIds.Any())
             {
               return Result.Success(new PagedResponse<CommentDto>
@@ -106,8 +107,9 @@ public class ListCommentsHandler : IQueryHandler<ListCommentsQuery, Result<Paged
               });
             }
           }
+
           break;
-          
+
         default:
           return Result.Error("Unknown admin role");
       }
@@ -116,7 +118,7 @@ public class ListCommentsHandler : IQueryHandler<ListCommentsQuery, Result<Paged
         request.PageNumber,
         request.PageSize,
         effectiveSubjectId,
-        null, 
+        null,
         subjectIds);
 
       var totalCount = await _commentRepository.CountAsync(specification, cancellationToken);

@@ -22,11 +22,11 @@ public class AuthService : IAuthService
 {
   private readonly IConfiguration _configuration;
   private readonly ICurrentUserService _currentUserService;
+  private readonly IEmailSender _emailSender;
   private readonly IMediator _mediator;
   private readonly IPasswordHasher<Admin> _passwordHasher;
   private readonly IAdminPermissionService _permissionService;
   private readonly IRepository<Admin> _repository;
-  private readonly IEmailSender _emailSender;
 
   public AuthService(
     IMediator mediator,
@@ -79,7 +79,7 @@ public class AuthService : IAuthService
     var sanitizedDepartmentId = request.DepartmentId > 0 ? request.DepartmentId : null;
 
     Admin newAdmin;
-    
+
     if (sanitizedDepartmentId.HasValue)
     {
       // Verify department exists
@@ -106,13 +106,13 @@ public class AuthService : IAuthService
       // Both IDs are null or zero - create Super Admin
       newAdmin = Admin.CreateSuperAdmin(request.AdminName, request.Email);
     }
-    
-    string  password = PasswordGenerator.GenerateSecurePassword();
-    bool isGeneratedPassword = false;
-    
+
+    var password = PasswordGenerator.GenerateSecurePassword();
+    var isGeneratedPassword = false;
+
     password = PasswordGenerator.GenerateSecurePassword();
     isGeneratedPassword = true;
-    
+
 
     // Set password hash
     var passwordHash = _passwordHasher.HashPassword(newAdmin, password);
@@ -139,7 +139,7 @@ public class AuthService : IAuthService
 
     return addedAdmin;
   }
-  
+
   public async Task<AuthResponse?> LoginRequestAsync(LoginRequest loginRequest)
   {
     var result = await _mediator.Send(new GetAdminByEmailQuery(loginRequest.Email));

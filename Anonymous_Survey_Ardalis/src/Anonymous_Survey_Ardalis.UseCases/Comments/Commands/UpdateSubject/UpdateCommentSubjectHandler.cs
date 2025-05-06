@@ -11,9 +11,9 @@ namespace Anonymous_Survey_Ardalis.UseCases.Comments.Commands.UpdateSubject;
 
 public class UpdateCommentSubjectHandler : ICommandHandler<UpdateCommentSubjectCommand, Result<bool>>
 {
+  private readonly IAdminPermissionService _adminPermissionService;
   private readonly IRepository<Comment> _commentRepository;
   private readonly IRepository<Subject> _subjectRepository;
-  private readonly IAdminPermissionService _adminPermissionService;
 
   public UpdateCommentSubjectHandler(
     IRepository<Comment> commentRepository,

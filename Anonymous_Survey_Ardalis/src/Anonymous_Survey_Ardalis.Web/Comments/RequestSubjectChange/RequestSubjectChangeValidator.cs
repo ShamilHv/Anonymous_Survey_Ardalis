@@ -11,10 +11,9 @@ public class RequestSubjectChangeValidator : Validator<RequestSubjectChangeReque
       .NotEmpty()
       .GreaterThan(0)
       .WithMessage("Comment ID is required");
-            
+
     RuleFor(x => x.Message)
       .MaximumLength(1000)
       .WithMessage("Message cannot exceed 1000 characters");
-    
   }
 }
