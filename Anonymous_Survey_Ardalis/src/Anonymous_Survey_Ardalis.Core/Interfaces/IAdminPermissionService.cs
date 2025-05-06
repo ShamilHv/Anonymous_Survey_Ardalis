@@ -12,5 +12,7 @@ public interface IAdminPermissionService
   Task<bool> CanRequestSubjectChange(int adminId, int commentId);
   Task<bool> CanUpdateCommentSubject(int adminId);
   Task<bool> CanReportInappropriateComment(int adminId, int commentId);
+  Task<bool> CanMarkCommentAsInappropriate(int adminId, int commentId);
+
 
 }

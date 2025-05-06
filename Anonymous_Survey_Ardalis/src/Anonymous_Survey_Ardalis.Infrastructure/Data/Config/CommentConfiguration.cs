@@ -22,6 +22,10 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
     builder.Property(c => c.CreatedAt)
       .HasDefaultValueSql("GETUTCDATE()");
 
+    // Add the new property with default value
+    builder.Property(c => c.IsAppropriate)
+      .HasDefaultValue(true);
+
     builder.HasOne(c => c.Subject)
       .WithMany()
       .HasForeignKey(c => c.SubjectId)
@@ -37,10 +41,9 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
       .HasForeignKey(c => c.FileId)
       .OnDelete(DeleteBehavior.SetNull);
 
-    // Fix this relationship - make it match the relationship in AdminConfiguration
     builder.HasOne(c => c.Admin)
-      .WithMany(a => a.Comments) // Specify the property name in Admin class
+      .WithMany(a => a.Comments)
       .HasForeignKey(c => c.AdminId)
-      .IsRequired(false); // Match the IsRequired setting
+      .IsRequired(false);
   }
 }

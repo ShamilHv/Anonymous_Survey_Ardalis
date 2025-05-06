@@ -347,5 +347,26 @@ public class AdminPermissionService : IAdminPermissionService
 
     return false;
   }
+  
+  public async Task<bool> CanMarkCommentAsInappropriate(int adminId, int commentId)
+  {
+    var adminSpec = new AdminByIdSpec(adminId);
+    var admin = await _adminRepository.FirstOrDefaultAsync(adminSpec);
+    if (admin == null)
+    {
+      return false;
+    }
+
+    // Only SuperAdmin can mark comments as inappropriate
+    if (admin.Role == AdminRole.SuperAdmin)
+    {
+      var commentSpec = new CommentByIdSpec(commentId);
+      var comment = await _commentRepository.FirstOrDefaultAsync(commentSpec);
+      return comment != null;
+    }
+
+    return false;
+  }
+
 
 }
