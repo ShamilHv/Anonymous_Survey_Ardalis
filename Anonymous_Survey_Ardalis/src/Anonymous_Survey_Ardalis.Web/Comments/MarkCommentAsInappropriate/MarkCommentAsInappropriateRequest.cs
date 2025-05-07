@@ -3,6 +3,6 @@
 public class MarkCommentAsInappropriateRequest
 {
   public static string Route => "/Comments/MarkAsInappropriate";
-    
+
   public int CommentId { get; set; }
 }

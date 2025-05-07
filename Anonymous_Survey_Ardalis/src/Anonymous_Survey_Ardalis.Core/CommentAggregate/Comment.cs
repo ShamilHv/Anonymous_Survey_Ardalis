@@ -21,8 +21,7 @@ public class Comment(int subjectId, string commentText) : EntityBase, IAggregate
   public bool IsAdminComment { get; set; } = false;
 
   public int? AdminId { get; set; }
-  
-  // New property with default value of true
+
   public bool IsAppropriate { get; set; } = true;
 
   public virtual Subject? Subject { get; set; }
@@ -35,6 +34,7 @@ public class Comment(int subjectId, string commentText) : EntityBase, IAggregate
 
   public virtual Admin? Admin { get; set; }
 }
+
 public class File : IAggregateRoot
 {
   public int FileId { get; set; }

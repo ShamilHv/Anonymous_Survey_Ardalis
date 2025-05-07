@@ -35,7 +35,7 @@ public class Create(
       return;
     }
 
-    var query = new GetCommentQuery(request.ParentCommentId);
+    var query = new GetCommentQuery(request.ParentCommentId, adminId);
 
     var comment = await _mediator.Send(query, cancellationToken);
 

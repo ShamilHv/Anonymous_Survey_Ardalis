@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Anonymous_Survey_Ardalis.Web.Comments.MarkCommentAsInappropriate;
 
-public class MarkCommentAsInappropriateValidator: Validator<MarkCommentAsInappropriateRequest>
+public class MarkCommentAsInappropriateValidator : Validator<MarkCommentAsInappropriateRequest>
 {
   public MarkCommentAsInappropriateValidator()
   {

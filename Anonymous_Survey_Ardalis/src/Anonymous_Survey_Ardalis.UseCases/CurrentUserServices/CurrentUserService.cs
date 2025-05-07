@@ -142,4 +142,9 @@ public class CurrentUserService : ICurrentUserService
 
     return result.Value;
   }
+
+  public HttpContext? GetHttpContext()
+  {
+    return _httpContextAccessor.HttpContext;
+  }
 }

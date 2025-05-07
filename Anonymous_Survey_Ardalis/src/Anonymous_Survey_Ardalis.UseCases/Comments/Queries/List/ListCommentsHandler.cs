@@ -114,14 +114,27 @@ public class ListCommentsHandler : IQueryHandler<ListCommentsQuery, Result<Paged
           return Result.Error("Unknown admin role");
       }
 
+      // Only SuperAdmin can see inappropriate comments
+      var showInappropriate = adminRole == AdminRole.SuperAdmin;
+
       var specification = new CommentPaginatedSpecification(
         request.PageNumber,
         request.PageSize,
         effectiveSubjectId,
         null,
-        subjectIds);
+        subjectIds,
+        showInappropriate);
 
-      var totalCount = await _commentRepository.CountAsync(specification, cancellationToken);
+      // Get total count with the filter but without pagination
+      var countSpecification = new CommentPaginatedSpecification(
+        1,
+        int.MaxValue,
+        effectiveSubjectId,
+        null,
+        subjectIds,
+        showInappropriate);
+
+      var totalCount = await _commentRepository.CountAsync(countSpecification, cancellationToken);
       var comments = await _commentRepository.ListAsync(specification, cancellationToken);
 
       var commentDtos = comments.Select(c =>

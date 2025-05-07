@@ -138,6 +138,42 @@ public class AdminPermissionService : IAdminPermissionService
     return false;
   }
 
+  public async Task<bool> CanGetCommentById(int adminId, int commentId)
+  {
+    var adminSpec = new AdminByIdSpec(adminId);
+    var admin = await _adminRepository.FirstOrDefaultAsync(adminSpec);
+    if (admin == null)
+    {
+      throw new Exception("Can't find admin");
+    }
+
+    var commentSpec = new CommentByIdSpec(commentId);
+    var comment = await _commentRepository.FirstOrDefaultAsync(commentSpec);
+    if (comment == null)
+    {
+      throw new Exception("Can't find comment");
+    }
+
+    if (admin.Role == AdminRole.SuperAdmin)
+    {
+      return true;
+    }
+
+    if (admin.Role == AdminRole.SubjectAdmin)
+    {
+      return comment.SubjectId == admin.SubjectId;
+    }
+
+    if (admin.Role == AdminRole.DepartmentAdmin)
+    {
+      var subject = await _subjectRepository.GetByIdAsync(comment.SubjectId);
+      return subject?.DepartmentId == admin.DepartmentId;
+    }
+
+    throw new UnauthorizedAccessException("You do not have permission to get the comment");
+  }
+
+
   public async Task<bool> CanDownloadFile(int adminId, int fileId)
   {
     var adminSpec = new AdminByIdSpec(adminId);
@@ -309,7 +345,7 @@ public class AdminPermissionService : IAdminPermissionService
     // Only SuperAdmin can update a comment's subject
     return admin.Role == AdminRole.SuperAdmin;
   }
-  
+
   public async Task<bool> CanReportInappropriateComment(int adminId, int commentId)
   {
     var adminSpec = new AdminByIdSpec(adminId);
@@ -347,7 +383,7 @@ public class AdminPermissionService : IAdminPermissionService
 
     return false;
   }
-  
+
   public async Task<bool> CanMarkCommentAsInappropriate(int adminId, int commentId)
   {
     var adminSpec = new AdminByIdSpec(adminId);
@@ -367,6 +403,4 @@ public class AdminPermissionService : IAdminPermissionService
 
     return false;
   }
-
-
 }

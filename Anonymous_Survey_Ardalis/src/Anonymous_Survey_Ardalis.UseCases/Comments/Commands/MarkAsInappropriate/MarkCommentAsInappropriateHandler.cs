@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Anonymous_Survey_Ardalis.UseCases.Comments.Commands.MarkAsInappropriate;
 
-public class MarkCommentAsInappropriateHandler: IRequestHandler<MarkCommentAsInappropriateCommand, Result<bool>>
+public class MarkCommentAsInappropriateHandler : IRequestHandler<MarkCommentAsInappropriateCommand, Result<bool>>
 {
   private readonly IRepository<Comment> _commentRepository;
   private readonly ICurrentUserService _currentUserService;
@@ -28,7 +28,7 @@ public class MarkCommentAsInappropriateHandler: IRequestHandler<MarkCommentAsIna
     try
     {
       var adminId = _currentUserService.GetCurrentAdminId();
-            
+
       // Get the comment
       var comment = await _commentRepository.GetByIdAsync(request.CommentId, cancellationToken);
       if (comment == null)
@@ -37,7 +37,7 @@ public class MarkCommentAsInappropriateHandler: IRequestHandler<MarkCommentAsIna
       }
 
       // Check permission if admin can mark this comment as inappropriate
-      bool hasPermission = await _permissionService.CanMarkCommentAsInappropriate(adminId, comment.Id);
+      var hasPermission = await _permissionService.CanMarkCommentAsInappropriate(adminId, comment.Id);
       if (!hasPermission)
       {
         return Result<bool>.Error("You don't have permission to mark this comment as inappropriate");
